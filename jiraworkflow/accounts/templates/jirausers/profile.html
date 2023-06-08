@@ -1,0 +1,204 @@
+{% load static %}
+{% load custom_tags %}
+
+<div class="page">
+	<div class="navbar">
+		<div class="navbar-bg"></div>
+		<div class="navbar-inner">
+		  <div class="left">
+            <a class="link" href="/jira/">
+                <img src="{% static 'img/jira.png' %}"  />
+            </a>
+          </div>
+		  <div class="title" style="text-align: center;">Синхронизация задач Jira</div>
+		  <div class="right">
+            <div>
+                <a class="link menu-home" href="#" {% if request.user.is_superuser %}superuser{% endif %}>
+                    <span style="color: black;width: 100%;">{{ request.user.username }}</span>
+                    <span class="material-icons link" style="color: black;opacity: 0.8;font-size: 36px;">account_circle</span>
+                </a>
+                </div>
+          </div>
+		</div>
+	  </div>
+      
+	<!-- Контент -->
+	<div class="page-content">
+        <div class="row" style="margin-left: 8px;margin-right: 8px;">
+            <div class="col">
+                <div class="card">
+                  <form method="POST" enctype="multipart/form-data" class="form-ajax-submit-onchange" action="./users/synchronization/{{request.user.id}}">
+                      {% csrf_token %}
+                      <div class="card-header">Синхронизация
+                        <label class="toggle toggle-init color-green">
+                          {{ sync.synchronization }}
+                          <span class="toggle-icon"></span>
+                        </label>
+                      </div>
+                    </form>
+                    <div class="card-content card-content-padding">
+                        <div class="list">
+                            <ul>
+                              <li>
+                                <div class="item-content">
+                                  <div class="item-media">
+                                    <form method="POST" class="form-ajax-submit-onchange" enctype="multipart/form-data" action="/profile/custom/filter/enable">
+                                      {% csrf_token %}
+                                      <label class="toggle toggle-init color-blue jira-flter">
+                                        {{ jira.filters.custom.enable.user_filter_custom }}
+                                        <span class="toggle-icon"></span>
+                                      </label>
+                                    </form>
+                                  </div>
+                                  <a class="item-link smart-select smart-select-init filter-global"  style="width: 100%;margin-left: 15px; {% if request.user.user_filter_custom %}display:none;{% endif %}" data-open-in="popup">
+                                    {{ jira.filters.global.filter }}
+                                    <div class="item-inner">
+                                      <div class="item-title">Фильры <!-- i>{{request.user.user_filter_custom}}</i --></div>
+                                    </div>
+                                  </a>
+                                  <a class="item-link smart-select smart-select-init filter-custom"  style="width: 100%;margin-left: 15px; {% if request.user.user_filter_custom %}{% else %}display:none;{% endif %}" data-open-in="popup">
+                                    <form  method="POST" class="form-ajax-submit-onchange" enctype="multipart/form-data" action="/profile/custom/filter/list">
+                                      {% csrf_token %}
+                                      {{ jira.filters.custom.list.user_filter }}
+                                      <div class="item-inner">
+                                        <div class="item-title">Фильры <!-- i>{{request.user.user_filter_custom}}</i --></div>
+                                      </div>
+                                    </form>
+                                  </a>
+                                </div>
+                              </li>
+                              <form method="POST" class="form-ajax-submit-onchange" enctype="multipart/form-data" action="/profile/custom/task">
+                                {% csrf_token %}
+                                <li>
+                                  <div class="item-content">
+                                    <div class="item-media">
+                                      <label class="toggle toggle-init color-blue jira-task">
+                                        {{ jira.syncweektime.custom.synchronization_custom }}
+                                        <span class="toggle-icon"></span>
+                                      </label>
+                                    </div>
+                                    <a class="item-link smart-select smart-select-init task-week-custom"  style="width: 100%;margin-left: 15px; {% if request.user.synchronization_custom %}{% else %}display:none;{% endif %}" data-open-in="sheet">
+                                      {{ jira.syncweektime.custom.synchronization_day_of_week}}
+                                      <div class="item-inner">
+                                        <div class="item-title">Дни недели</div>
+                                      </div>
+                                    </a>
+                                    <div class="smart-select smart-select-init task-week-global" style="pointer-events: none;width: 100%;margin-left: 15px; {% if request.user.synchronization_custom %}display:none;{% endif %}" data-open-in="sheet">
+                                      {{ jira.syncweektime.global.day_of_week}}
+                                      <div class="item-inner">
+                                        <div class="item-title">Дни недели</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li>
+                                  <div class="item-content">
+                                    <div class="item-media">
+                                    </div>
+                                    <a class="item-link smart-select smart-select-init task-time-custom"  style="width: 100%;margin-left: 15px; {% if request.user.synchronization_custom %}{% else %}display:none;{% endif %}" data-open-in="sheet">
+                                      {{jira.syncweektime.custom.user_time}}
+                                      <div class="item-inner">
+                                        <div class="item-title">Время старта</div>
+                                      </div>
+                                    </a>
+                                    <div class="smart-select smart-select-init task-time-global"  style="pointer-events: none;width: 100%;margin-left: 15px; {% if request.user.synchronization_custom %}display:none;{% endif %}" data-open-in="sheet">
+                                      {{jira.syncweektime.global.time}}
+                                      <div class="item-inner">
+                                        <div class="item-title">Время старта</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </li>
+                              </form>
+                            </ul>
+                          </div>
+                    </div>
+                    <div class="card-footer"></div>
+                  </div>
+                <!--div class="block block-strong no-padding" style="margin-top: 0px;margin-bottom: 0px;">
+                    <div id="demo-calendar-inline-container"></div>
+                  </div -->
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">Card header</div>
+                    <div class="card-content card-content-padding">Card with header and footer. Card headers are used to display
+                      card titles and footers for additional information or just for custom actions.</div>
+                    <div class="card-footer">Card Footer</div>
+                  </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">Card header</div>
+                    <div class="card-content card-content-padding">Card with header and footer. Card headers are used to display
+                      card titles and footers for additional information or just for custom actions.</div>
+                    <div class="card-footer">Card Footer</div>
+                  </div>
+            </div>
+          </div>
+          <div class="row-100" style="height: 52%;position: fixed;width: 100%;">
+            <div class="card data-table" style="height: 100%;margin-top: 0px;margin-right: 10px;margin-left: 10px;"><table>
+                <thead>
+                  <tr>
+                    <th class="datetime-cell" style="width: 15%;">Дата и время запуска</th>
+                    <th class="datetime-cell" style="width: 15%;">Дата и время завершения</th>
+                    <th class="label-cell" style="width: 35%;">Задача</th>
+                    <th class="label-cell" style="width: 20%;">Нуделя</th>
+                    <th class="label-cell" style="width: 10%;">Статус</th>
+                    <th class="actions-cell" style="width: 5%;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for header in TaskResult %}
+                    {% get_task_children header.task_id request.user.email as usertasks %}
+                    {% for user in usertasks %}
+                      {% get_task_children user.task_id request.user.email as projectasks %}
+                      {% for task in weektasks %}
+                        {% get_status_sync header.task_id request.user.username as status %}
+                    <tr>
+                      <td class="datetime-cell">{{ task.date_created }}</td>
+                      <td class="datetime-cell">{{ task.date_done }}</td>
+                      <td class="label-cell">{{ task.task_name }}</td>
+                      <td class="label-cell">{{ task.result }}</td>
+                      <td class="label-cell"><span id="{{task.task_id}}" class="badge link {{ status.status|statcolor }}" >{{ status.status|rustatus }}</span></td>
+                      <td class="actions-cell"><a href="/worklog/{{task.task_id}}" class="material-icons profile-link icon link hover-op worktask-details" style="display: block;opacity: 0.5;">subject</span></td>
+                    </tr>
+                      {% endfor %}
+                    {% endfor %}
+                  {% endfor %}  
+                  <tr>
+                    <td class="datetime-cell"></td>
+                    <td class="datetime-cell"></td>
+                    <td class="label-celll"></td>
+                    <td class="label-cell"></td>
+                    <td class="label-cell"></td>
+                    <td class="label-cell"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="data-table-footer" style="position: absolute;width: 100%;bottom: 0;">
+                <div class="data-table-rows-select">
+                  Per page:
+                  <div class="input input-dropdown input-with-value">
+                    <select class="input-with-value">
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="all">All</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="data-table-pagination">
+                  <span class="data-table-pagination-label">1-5 of 10</span>
+                  <a href="#" class="link disabled">
+                    <i class="icon icon-prev color-gray"></i>
+                  </a>
+                  <a href="#" class="link">
+                    <i class="icon icon-next color-gray"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+                        
+</div>

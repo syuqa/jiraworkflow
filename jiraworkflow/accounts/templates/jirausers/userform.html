@@ -1,0 +1,49 @@
+<form method="POST" class="form-ajax-submit" enctype="multipart/form-data" rederect="/users/" action="./users/form/{{id}}">
+    {% csrf_token %}
+    <div class="list no-hairlines-md" style="margin-top: 15px;margin-bottom: 15px;">
+        <div style="margin-left: -10px;margin-right: -10px;">
+          <li class="item-content item-input item-input-outline" style="padding-left: 0px;">
+            <div class="item-inner" style="padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
+              <div class="item-title item-floating-label">Фамилия, Имя</div>
+              <div class="item-input-wrap">
+                {{form.first_name}}
+                <span class="input-clear-button"></span>
+              </div>
+            </div>
+          </li>
+          <li class="item-content item-input item-input-outline" style="padding-left: 0px;">
+            <div class="item-inner" style="padding-right: 0px;padding-top: 8px;padding-bottom: 0px;">
+              <div class="item-title item-floating-label">Логин</div>
+              <div class="item-input-wrap" style="padding-top: 0px;">
+                {{form.username}}
+                <span class="input-clear-button"></span>
+              </div>
+            </div>
+          </li>
+          <li class="item-content item-input item-input-outline" style="padding-left: 0px;">
+            <div class="item-inner" style="padding-right: 0px;padding-top: 8px;padding-bottom: 0px;">
+              <div class="item-title item-floating-label">Email</div>
+              <div class="item-input-wrap" style="padding-top: 0px;">
+                {{form.email}}
+                <span class="input-clear-button"></span>
+              </div>
+            </div>
+          </li>
+          <li class="item-content item-input item-input-outline" style="padding-left: 7px;padding-right: 5px;padding-top: 8px;margin-top: 8px;">
+            Супер пользователь
+            <label class="toggle toggle-init color-red">
+              {{form.is_superuser}}
+              <span class="toggle-icon"></span>
+            </label>
+          </li>
+        </div>
+        </div>
+        <p class="segmented segmented-raised" style="
+                margin-bottom: -10px;
+                margin-left: -25px;
+                margin-right: -25px;
+                margin-top: 28px; ">
+        <button class="button close" style="border-radius: 0;height: 45px;">Отмена</button>          
+        <button class="button create" style="border-radius: 0;height: 45px;" type="submit">{% if id == 0 %}Создать{% else %}Сохранить{% endif %}</button>
+        </p>
+    </form>

@@ -1,0 +1,51 @@
+{% load static %}
+{% load account socialaccount %}
+<div class="page no-navbar no-toolbar no-swipeback login-screen-page">
+    <div class="page-content login-screen-content">
+      <div class="login-screen-title">Авторизация</div>
+      <form method="post" action="/accounts/login">
+        {% csrf_token %}
+        <div class="list">
+          <ul>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Имя пользователя</div>
+                <div class="item-input-wrap">
+                  {{form.username}}
+                  <span class="input-clear-button"></span>
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Пароль</div>
+                <div class="item-input-wrap">
+                  {{form.password}}
+                  <span class="input-clear-button"></span>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="list" style="margin-bottom: 0px;">
+            <ul>
+              <li><button href="#" style="background: #F1F2F5;" class="button" type="submit" >Вход</a></li>
+              <li class="" style="text-align: center;display: flex;padding-top: 15px;padding-bottom: 15px;width: 60%;left: 20%;"><i style="color: #f5deb300;border-color: #00000021;border-style: solid;border-width: 0px 0px 1px 0px;padding-right: 0px;margin-right: 20px;flex: none;flex-grow: 1;height: 15px;" class=""></i><span class="" style="color: gray;font-weight: 1;">или</span><i style="color: #f5deb300;border-color: #00000021;border-style: solid;border-width: 0px 0px 1px 0px;padding-right: 0px;margin-left: 20px;flex: none;flex-grow: 1;height: 15px;" class=""></i></li>
+            </ul>
+        </div>
+      </form>
+      <form method="post" action="{% provider_login_url 'yandex' process='login' %}">
+        {% csrf_token %}
+        <div class="list" style="margin-top: 0px;">
+          <ul>
+            <li>
+              <button class="button yandex" style="background: black;color: white;" type="submit">
+                <img width="20px" height="20px" src="{% static 'img/Yandex_znak.png' %}" style="padding-right: 10px;" />
+                 Войти с Яндекс ID</button>
+            </li>
+          </ul>
+        </div>
+      </form>
+
+    </div>
+  </div>

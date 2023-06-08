@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+{% load djangocodemirror_tags %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/django_json_widget.css' %}">
+  <link rel="stylesheet" href="{% static 'css/jsoneditor.min.css' %}">
+{% endblock %}
+
+{% block routes %}
+  <script src="{% static 'js/jirausers/routes.js' %}"></script>
+  <script src="{% static 'js/jsoneditor.min.js' %}"></script>
+  {% codemirror_instance 'javascript' 'code_codemirror' 'json' %}
+{% endblock %}

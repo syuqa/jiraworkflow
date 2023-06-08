@@ -1,0 +1,97 @@
+{% load static %}
+{% load custom_tags %}
+{% load djangocodemirror_tags %}
+
+<div class="row" style="height: 85%;">
+    <div class="col-35" style="height: 100%;">
+      <div class="block-title">Пользователь</div>
+      <div class="list list-users" style="border-style: groove;border-width: 0px 1px 0px 0px;border-color: #00000024;padding-right: 15px;height: 100%;">
+        <ul>
+          {% for user in users %}
+          {% get_status_sync task user as status %}
+            <li user="{{user}}">
+              <a href="#" user="{{user}}" task="{{task|get_task_syncusers:user}}" class="item-link item-content">
+                <div class="item-media">  
+                  <span id="{{task|get_task_syncusers:user}}" class="badge link {{ status.status|statcolor }}">{{ status.status|rustatus }}</span>
+                </div>
+                <div class="item-inner">
+                  <div class="item-title">{{user}}</div>
+                  <div class="item-after"></div>
+                </div>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-30" style="height: 100%;">
+      <div class="block-title">Неделя</div>
+      <div class="list list-weeks" style="border-style: groove;border-width: 0px 1px 0px 0px;border-color: #00000024;padding-right: 15px;height: 100%;">
+        <ul>
+            {% for user, weeks in data|items %}
+              {% for week, project in weeks|items %}
+              {% get_status_sync task user week as status %}
+              <li style="display: none;" user="{{user}}" week="{{week}}">
+                  <a href="#" week="{{week}}" user="{{user}}" task="{{task|get_task_synweek:user}}" class="item-link item-content">
+                    <div class="item-media"><span id="{{task|get_task_synweek:user}}" class="badge link {{ status.status|statcolor }}">{{ status.status|rustatus }}</span></div>
+                    <div class="item-inner">
+                      <div class="item-title tooltip-init" data-tooltip="{{week|weekinfo:'dates'}}">{{week|weekinfo:'week'}}</div>
+                      <div class="item-after"></div>
+                    </div>
+                  </a>
+              </li>
+              {% endfor %}
+            {% endfor %}
+            <li class="list-null">
+              <div class="item-content">
+                <div class="item-inner">
+                  <div class="item-title" style="opacity: 0.4"> Выбири пользьзователя</div>
+                </div>
+              <div>
+            </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-35" style="height: 100%;">
+      <div class="block-title">Проект, задача</div>
+      <div class="list list-tasks" style="border-style: groove;border-width: 0px 1px 0px 0px;border-color: #00000024;padding-right: 15px;height: 100%;">
+        <ul>
+          {% for user, wks in data|items %}
+            {% for week, projects in wks|items %}
+              {% for project, tasks in projects|items %}
+                {% for issue, data in tasks|items %}
+                  {% for date, time in data.worklog|items %}
+                  {% get_status_sync task user week project as status %}
+                    <li style="display: none;" user="{{user}}" week="{{week}}">
+                      <a href="#" class="item-link item-content popup-open" data-popup=".sync-{% strhash user week issue %}-popup">
+                        <div class="item-media"><span class="badge link {{ status.status|statcolor }}">{{status.status|rustatus}}</span></div>
+                        <div class="item-inner">
+                          <div class="item-title"><div class="link" href="{{data.link}}">{{issue}}</div></div>
+                          <div class="item-after">{{date}}</div>
+                        </div>
+                        <!-- div>{{ status.result }}</div-->
+                      </a>
+                      <div class="popup popup-sync-status sync-{% strhash user week issue %}-popup">
+                        <div class="view">
+                          <div class="page">
+                            <div class="page-content">
+                              <input style="display: none;" type="text" name="task-status" value="{{status.status}}" />
+                              <div style="height:100%;width:100%;display:inline-block;" required="" id="id_json" class=""></div>
+                              <textarea id="id_json_textarea" name="json" required="" style="display: none" >{{status.result}}</textarea>
+                              <!--form style="height: 100%;">
+                                <textarea id="json" name="code">{{status.trace}}</textarea>
+                              </form-->
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  {% endfor %}
+                {% endfor %}
+              {% endfor %}
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+  </div>
+</div>

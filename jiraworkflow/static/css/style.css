@@ -1,0 +1,177 @@
+.hover-op-0:hover {
+    opacity: 0 !important;
+  }
+  
+  .hover-hover-op-1:hover {
+    opacity: 0.1 !important;
+  }
+  
+  .hover-op-2:hover {
+    opacity: 0.2 !important;
+  }
+  
+  .hover-op-3:hover {
+    opacity: 0.3 !important;
+  }
+  
+  .hover-op-4:hover {
+    opacity: 0.4 !important;
+  }
+  
+  .hover-op-5:hover {
+    opacity: 0.5 !important;
+  }
+  
+  .hover-op-6:hover {
+    opacity: 0.6 !important;
+  }
+  
+  .hover-op-7:hover {
+    opacity: 0.7 !important;
+  }
+  
+  .hover-op-8:hover {
+    opacity: 0.8 !important;
+  }
+  
+  .hover-op-9:hover {
+    opacity: 0.9 !important;
+  }
+  
+  .hover-op:hover {
+    opacity: 1 !important;
+  }
+
+.menu-button {
+    width: 100%;
+    color: white;
+}
+
+.dialog-nemu {
+    text-align: center;
+}
+
+.menu-button {
+    margin-top: 6px !important;
+}
+
+.dialog-title {
+    border-style: groove;
+    border-width: 0px 0px 1px 0px;
+    border-color: #0000002b;
+    padding-bottom: 10px;
+}
+
+.dialog-inner {
+    padding-bottom: 10px;
+}
+.seagreen {
+    background: seagreen;
+}
+
+.dialog-filters {
+    width: 800px !important;
+    left: 32% !important;
+}
+
+.dialog-filters .dialog-title {
+    text-align: center;
+}
+
+.simple {
+    pointer-events: none !important;
+    opacity: 0.5;
+  }
+
+.dialog-users {
+    width: 80% !important;
+    left: 20% !important;
+    height: 80% !important;
+}
+
+.dialog-users .dialog-inner {
+    padding: 0;
+    height: 100%;
+}
+
+.dialog-users .data-table {
+    margin: 0;
+    height: 100%;
+}
+
+.dialog-users .dialog-title {
+    display: none;
+}
+
+.dialog-users .card-content {
+    height: 78%;
+}
+
+.dialog-users .data-table tbody td::before, .data-table tbody th::before {
+	height: 0.5px !important;
+}
+
+.dialog-title {
+    text-align: center;
+}
+
+.button-seporator {
+
+        margin-bottom: 10px !important;
+        margin-top: 0px !important;
+        height: 18px !important;
+        border-style: groove !important;
+        border-width: 0px 0px 1px 0px !important;
+        border-radius: 0 !important;
+        width: 62% !important;
+        right: 18% !important;
+        border-color: #00000038 !important;
+        pointer-events: none !important;
+}
+
+.darkslateblue {
+    background: darkslateblue;
+}
+
+.dialog-buttons {
+    padding-top: 0px !important;
+}
+
+.yandex {
+    background: black !important;
+    color: white !important;
+}
+
+.ya-logo {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='64' height='64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23FC3F1D'/%3E%3Cpath d='M37.02 52h6.977V12H33.842c-10.213 0-15.57 5.228-15.57 12.951 0 6.667 3.473 10.426 9.625 14.509l3.738 2.467-4.798-4.024L17.33 52h7.564L35.05 36.846l-3.532-2.35c-4.268-2.878-6.358-5.11-6.358-9.956 0-4.258 3.003-7.136 8.712-7.136h3.12V52h.03z' fill='%23fff'/%3E%3C/svg%3E");
+}
+
+.dialog-project {
+    width: 1000px !important;
+    left: 25% !important;
+}
+
+.mCSB_dragger_bar{
+    display: none;
+}
+
+.popup-sync-status .CodeMirror {
+  padding-left: 20px;
+  height: 100%;
+}
+
+.hide {
+  display: none !important;
+}
+
+.jsoneditor-sort {
+  display: none !important;
+}
+
+.jsoneditor-transform {
+  display: none !important;
+}
+
+.jsoneditor-repair {
+  display: none !important;
+}

@@ -1,0 +1,35 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+Django = "*"
+"psycopg2-binary" = "*"
+gunicorn = "*"
+django-rest-framework = "*"
+whitenoise = "==3.3.1"
+django-utils-six = "*"
+django-appconf = "==1.0.2"
+python-social-auth = {extras = ["django"], version = "*"}
+social-auth-app-django = "*"
+django-allauth = "*"
+django-crispy-forms = "*"
+django-websocket-redis = "*"
+django-celery-results = "*"
+django-redis = "*"
+celery = "*"
+django-celery-beat = "*"
+django-multiselectfield = "*"
+jira = "*"
+jinja2 = "*"
+django-json-widget = "*"
+django-codemirror2 = "*"
+djangocodemirror = "*"
+
+[dev-packages]
+tox = "*"
+ipython = "*"
+
+[requires]
+python_version = "3.8"

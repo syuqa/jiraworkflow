@@ -1,0 +1,135 @@
+{% load static %}
+<div class="page">
+    <div class="navbar">
+		<div class="navbar-bg"></div>
+		<div class="navbar-inner">
+		  <div class="left">
+            <a class="link" href="/jira/">
+                <img src="{% static 'img/jira.png' %}"  />
+            </a>
+          </div>
+		  <div class="title" style="text-align: center;">Список пользователей Jira</div>
+		  <div class="right">
+            <div>
+                <a class="link menu-users" href="#" {% if request.user.is_superuser %}superuser{% endif %}>
+                    <span style="color: black;width: 100%;">{{ request.user.username }}</span>
+                    <span class="material-icons link" style="color: black;opacity: 0.8;font-size: 36px;">account_circle</span>
+                </a>
+                </div>
+          </div>
+		</div>
+	</div>
+    <div class="page-content">
+        <div class="data-table data-table-init card" style="margin: 0;height: 100%;">
+            <!-- Card header -->
+            <div class="card-header" style="padding-left: 15px;padding-right: 30px;">
+                <!-- Default table header -->
+                <div class="data-table-header">
+                <!-- Default table title -->
+                <div style="width: 50%;">
+                    <form class="searchbar" style="margin-top: 0px;margin-bottom: 0px;margin-left: 0px;margin-right: 0px;box-shadow: none;">
+                      <div class="searchbar-inner">
+                        <div class="searchbar-input-wrap" >
+                          <input type="search" placeholder="Поиск">
+                          <i class="searchbar-icon"></i>
+                          <span class="input-clear-button ripple-inset"></span>
+                        </div>
+                        <span class="searchbar-disable-button if-not-aurora">Cancel</span>
+                      </div>
+                    </form>
+                  </div>
+                <div class="data-table-title"></div>
+                <!-- Default table actions -->
+                <div class="data-table-actions">
+                    <!-- a class="link icon-only">
+                        <i class="icon f7-icons if-not-md">line_horizontal_3_decrease</i>
+                        <i class="icon material-icons md-only">sort</i>
+                    </a -->
+                    <a class="link icon-only add-user">
+                    <i class="icon material-icons md-only">person_add</i>
+                    </a>
+                </div>
+                </div>
+                <!-- Selected table header -->
+                <div class="data-table-header-selected">
+                <!-- Selected table title -->
+                <div class="data-table-title-selected"><span class="data-table-selected-count"></span> items selected</div>
+                <!-- Selected table actions -->
+                <div class="data-table-actions">
+                    <a class="link icon-only user-remove">
+                        <i class="icon material-icons md-only" style="color: red;">delete</i>
+                    </a>
+                    <a class="link icon-only add-user">
+                        <i class="icon material-icons md-only">person_add</i>
+                    </a>
+                </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell">
+                            <label class="checkbox">
+                              <input type="checkbox" />
+                              <i class="icon-checkbox"></i>
+                            </label>
+                          </th>
+                        <th class="label-cell">Имя пользователя</th>
+                        <th class="label-cell">Фамилия Имя</th>
+                        <th class="label-cell">Email</th>
+                        <th class="actions-cell" style="text-align: center;">Синхронизация</th>
+                        <th class="actions-cell"></th>
+                    </tr>
+                </thead>
+                <tbody class="searchbar-found">
+                    {% for user in users %}
+                    <tr>
+                        <td class="checkbox-cell">
+                            <label class="checkbox">
+                              <input type="checkbox" index="{{user.id}}" />
+                              <i class="icon-checkbox"></i>
+                            </label>
+                          </td>
+                        <td class="label-cell">{{ user.username }}</td>
+                        <td class="label-cell">{{ user.first_name }}</td>
+                        <td class="label-cell">{{ user.email }}</td>
+                        <td class="actions-cell" style="text-align: center;">
+                            <form method="POST" enctype="multipart/form-data" class="form-ajax-submit-onchange" action="./users/synchronization/{{user.id}}">
+                                {% csrf_token %}
+                                <label class="toggle toggle-init color-blue">
+                                    <input name="synchronization" type="checkbox" {% if user.synchronization %}checked{% endif %} />
+                                    <span class="toggle-icon"></span>
+                                </label>
+                            </form>
+                        </td>
+                        <th class="actions-cell">
+                            <span class="icon material-icons user-edit link" index="{{user.id}}" style="color: #18000096;margin-top: 6px;">manage_accounts</span>
+                        </th>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td class="checkbox-cell"></td>
+                        <td class="label-cell"></td>
+                        <td class="label-cell"></td>
+                        <td class="label-cell"></td>
+                        <td class="actions-cell"></td>
+                        <th class="actions-cell"></th>
+                    </tr>
+                </tbody>
+                <tbody class="searchbar-not-found">
+                    <tr>
+                        <td class="checkbox-cell"></td>
+                        <td class="label-cell"></td>
+                        <td class="label-cell">Не найдено</td>
+                        <td class="label-cell"></td>
+                        <td class="actions-cell"></td>
+                        <th class="actions-cell"></th>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+            </div>
+    </div>
+</div>
+

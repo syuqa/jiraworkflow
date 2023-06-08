@@ -1,0 +1,11 @@
+    {% for task in tasks %}
+    <li task="{{task.id}}">
+      <label class="item-radio item-radio-icon-start item-content">
+        <input type="radio" name="project-task" value="{{task.id}}" />
+        <i class="icon icon-radio"></i>
+        <div class="item-inner">
+          <div class="item-title">{{task.name}}</div>
+        </div>
+      </label>
+    </li>
+    {% endfor %}

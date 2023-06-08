@@ -1,0 +1,227 @@
+{% load static %}
+{% load custom_tags %}
+
+<div class="page">
+	<div class="navbar">
+		<div class="navbar-bg"></div>
+		<div class="navbar-inner">
+		  <div class="left">
+            <a class="link" href="/jira/">
+                <img src="{% static 'img/jira.png' %}"  />
+            </a>
+          </div>
+		  <div class="title" style="text-align: center;">Настройка профиля Jira</div>
+		  <div class="right">
+            <div>
+                <a class="link menu-jira" href="#" {% if request.user.is_superuser %}superuser{% endif %}>
+                    <span style="color: black;width: 100%;">{{ request.user.username }}</span>
+                    <span class="material-icons link" style="color: black;opacity: 0.8;font-size: 36px;">account_circle</span>
+                </a>
+                </div>
+          </div>
+		</div>
+	</div>
+      
+	<!-- Контент -->
+	<div class="page-content">
+        <div class="row" style="margin-left: 8px;margin-right: 8px;">
+            <div class="col {% if request.user.is_superuser %}{% else %}simple{% endif %}">
+                <form method="POST" redirect="/jira/" class="card form-ajax-submit jira-account" action="./jira/">
+                  {% csrf_token %}
+                  <div class="card-header">Аккаунт</div>
+                  <div class="card-content card-content-padding" style="padding-bottom: 8px;">
+                    <div class="list no-hairlines-md">
+                      <ul>
+                        <li class="item-content item-input">
+                          <div class="item-media">
+                            <i class="icon material-icons">api</i>
+                          </div>
+                          <div class="item-inner">
+                            <div class="item-input-wrap">
+                              {{jiraform.url}}
+                              <span class="input-clear-button"></span>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="item-content item-input">
+                          <div class="item-media">
+                            <i class="icon material-icons">person</i>
+                          </div>
+                          <div class="item-inner">
+                            <div class="item-input-wrap">
+                              {{jiraform.username}}
+                              <span class="input-clear-button ripple-inset"></span>
+                          </div>
+                        </li>
+                        <li class="item-content item-input">
+                          <div class="item-media" style="padding-bottom: 0px;padding-top: 0px;">
+                            <i class="icon material-icons" style="padding-top: 8px;padding-bottom: 10px;">key</i>
+                          </div>
+                          <div class="item-inner" style="padding-bottom: 0px;padding-top: 5px;">
+                            <div class="item-input-wrap">
+                              {{jiraform.password}}
+                              <span class="input-clear-button"></span>
+                          </div>
+                        </li>
+                        
+                      </ul>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <button class="button" type="submit">сохранить</button>
+                </div>
+              </form>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">Фильтры
+                      <span class="material-icons link create-filter">add</span>
+                    </div>
+                    <div class="card-content card-content-padding" style="height: 112px;">
+                      <div class="list filter-list" page="1">
+                        <ul>
+                          {% for i, filter in jirafilter|enum %}
+                          <li index="{{i}}" style="display: {% if i < 3 %}{% else %} none {% endif %};">
+                            <a href="#" id="{{filter.id}}" class="item-link item-content edit-filter">
+                              <div class="item-media"><i class="icon icon-f7"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title">{{ filter.name }}</div>
+                                <div class="item-after"></div>
+                              </div>
+                            </a>
+                          </li>
+                          {% endfor %}
+                        </ul>
+                      </div>  
+                    </div>
+                    <div class="card-footer action-filter-list">
+                        <div style="width: 100%; text-align: center;">
+                          <a class="icon material-icons link back" style="float: left;">chevron_left</a>
+                          <span class="in" style="padding-right: 10px;">1</span> из <span class="max" style="padding-left: 10px;">{{jirafilter|max3list}}</span>
+                          <a class="icon material-icons link next" style="float: right;">navigate_next</a>
+                        </div>
+                        </div>
+                  </div>
+            </div>
+            <div class="col {% if request.user.is_superuser %}{% else %}simple{% endif %}">
+              <div class="card card">
+                <form method="POST" redirect="/jira/" enctype="multipart/form-data" class="form-ajax-submit-onchange jira-exercise {% if jirafilter|len > 0 %}{% else %}simple{% endif %}"  action="./jira/exercise/enable">
+                  {% csrf_token %}
+                  <div class="card-header">Периодическое задание
+                        <div style="display: flex;" class="{% if jiraexercise_exist %}{% else %}simple{% endif %}">
+                          <span class="material-icons link run-sync tooltip-init hover-op" data-tooltip="Принудительный запуск" style="margin-right: 15px;opacity: 0.5;">play_arrow</span>
+                          <label class="toggle toggle-init color-green" type="submit">
+                            {{ jiraexercise_enable.enable }}
+                            <span class="toggle-icon"></span>
+                          </label>
+                        </div>
+                  </div>
+                </form>
+                <form method="POST" redirect="/jira/" enctype="multipart/form-data" class="form-ajax-submit jira-exercise {% if jirafilter|len > 0 %}{% else %}simple{% endif %}"  action="./jira/exercise">
+                  {% csrf_token %}
+                  <div class="card-content card-content-padding">
+                      <div class="list">
+                          <ul>
+                              <li>
+                                  <a class="item-link smart-select smart-select-init" data-open-in="popup">
+                                    {{ jiraexercise.filter }}
+                                    <div class="item-content">
+                                      <div class="item-inner">
+                                        <div class="item-title">Фильры</div>
+                                      </div>
+                                    </div>
+                                  </a>
+                              </li>
+                            <li>
+                              <a class="item-link smart-select smart-select-init" data-open-in="popup">
+                                {{ jiraexercise.day_of_week }}
+                                <div class="item-content">
+                                  <div class="item-inner">
+                                    <div class="item-title">Дни недели</div>
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                            <li>
+                              <a class="item-link smart-select smart-select-init" data-open-in="sheet">
+                                {{ jiraexercise.time }}
+                                <div class="item-content">
+                                  <div class="item-inner">
+                                    <div class="item-title">Время старта</div>
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                  </div>
+                  <div class="card-footer">
+                    <button class="button" type="submit">сохранить</button>
+                  </div>
+                </form>
+             </div>
+              <!--div class="block block-strong no-padding" style="margin-top: 0px;margin-bottom: 0px;">
+                  <div id="demo-calendar-inline-container"></div>
+                </div -->
+          </div>
+        </div>
+        <div class="row-100" style="height: 52%;position: fixed;width: 100%;">
+          <div class="card data-table" style="height: 100%;margin-top: 0px;margin-right: 10px;margin-left: 10px;"><table>
+              <thead>
+                <tr>
+                  <th class="datetime-cell" style="width: 15%;">Дата и время запуска</th>
+                  <th class="datetime-cell" style="width: 15%;">Дата и время завершения</th>
+                  <th class="label-cell" style="width: 35%;">Задача</th>
+                  <th class="label-cell" style="width: 20%;">Пользователь</th>
+                  <th class="label-cell" style="width: 10%;">Статус</th>
+                  <th class="actions-cell" style="width: 5%;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for task in TaskResult %}
+                {% get_status_sync task.task_id as status %}
+                <tr>
+                  <td class="datetime-cell">{{ task.date_created }}</td>
+                  <td class="datetime-cell">{{ task.date_done }}</td>
+                  <td class="label-cell">{{ task.task_name }}</td>
+                  <td class="label-cell">{{ task.task_kwargs|runuser }}</td>
+                  <td class="label-cell"><span id="{{task.task_id}}" class="badge link {{ status.status|statcolor }}" >{{ status.status|rustatus }}</span></td>
+                  <td class="actions-cell"><a href="/worklog/{{task.task_id}}" class="material-icons profile-link icon link hover-op worktask-details" style="display: block;opacity: 0.5;">subject</span></td>
+                </tr>
+                {% endfor %}  
+                <tr>
+                  <td class="datetime-cell"></td>
+                  <td class="datetime-cell"></td>
+                  <td class="label-celll"></td>
+                  <td class="label-cell"></td>
+                  <td class="label-cell"></td>
+                  <td class="label-cell"></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="data-table-footer" style="position: absolute;width: 100%;bottom: 0;">
+              <div class="data-table-rows-select">
+                Per page:
+                <div class="input input-dropdown input-with-value">
+                  <select class="input-with-value">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="all">All</option>
+                  </select>
+                </div>
+              </div>
+              <div class="data-table-pagination">
+                <span class="data-table-pagination-label">1-5 of 10</span>
+                <a href="#" class="link disabled">
+                  <i class="icon icon-prev color-gray"></i>
+                </a>
+                <a href="#" class="link">
+                  <i class="icon icon-next color-gray"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+                        
+</div>

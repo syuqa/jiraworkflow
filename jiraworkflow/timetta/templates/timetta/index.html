@@ -1,0 +1,162 @@
+{% load static %}
+{% load custom_tags %}
+<div class="page">
+	<div class="navbar">
+		<div class="navbar-bg"></div>
+		<div class="navbar-inner">
+		  <div class="left">
+            <a class="link" href="/home/">
+                <img width="130px" src="{% static 'img/timetta.png' %}"  />
+            </a>
+          </div>
+		  <div class="title" style="text-align: center;">Настройка профиля Timetta</div>
+		  <div class="right">
+            <div>
+                <a class="link menu-timetta" href="#" {% if request.user.is_superuser %}superuser{% endif %}>
+                    <span style="color: black;width: 100%;">{{ request.user.username }}</span>
+                    <span class="material-icons link" style="color: black;opacity: 0.8;font-size: 36px;">account_circle</span>
+                </a>
+                </div>
+          </div>
+		</div>
+	</div>
+      
+	<!-- Контент -->
+	<div class="page-content">
+        <div class="row" style="margin-left: 8px;margin-right: 8px;">
+            <div class="col {% if request.user.is_superuser %}{% else %}simple{% endif %}">
+                <form method="POST" redirect="/timetta/" class="card form-ajax-submit jira-account" action="./timetta/">
+                  {% csrf_token %}
+                  <div class="card-header">Аккаунт
+                    <a href="#" class="link edit-simple {% if exist %}{% else %}simple{% endif %}" style="text-decoration: underline;color: #000;font-weight: 1;">шаблон</a>
+                  </div>
+                  <div class="card-content card-content-padding" style="padding-bottom: 8px;">
+                    <div class="list no-hairlines-md">
+                      <ul>
+                        <li class="item-content item-input">
+                          <div class="item-media">
+                            <i class="icon material-icons">api</i>
+                          </div>
+                          <div class="item-inner">
+                            <div class="item-input-wrap">
+                              <input type="text" name="url" placeholder="Адрес сервера" value="app.timetta.com" maxlength="300" required="" id="id_url" class="">
+                              <span class="input-clear-button"></span>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="item-content item-input">
+                          <div class="item-media">
+                            <i class="icon material-icons">person</i>
+                          </div>
+                          <div class="item-inner">
+                            <div class="item-input-wrap">
+                              {{timettaform.username}}
+                              <span class="input-clear-button ripple-inset"></span>
+                          </div>
+                        </li>
+                        <li class="item-content item-input">
+                          <div class="item-media" style="padding-bottom: 0px;padding-top: 0px;">
+                            <i class="icon material-icons" style="padding-top: 8px;padding-bottom: 10px;">key</i>
+                          </div>
+                          <div class="item-inner" style="padding-bottom: 0px;padding-top: 5px;">
+                            <div class="item-input-wrap">
+                              {{timettaform.password}}
+                              <span class="input-clear-button"></span>
+                          </div>
+                        </li>
+                        
+                      </ul>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <button class="button" type="submit">сохранить</button>
+                </div>
+              </form>
+            </div>
+            <div class="col">
+                <div class="card {% if exist %}{% else %}simple{% endif %}" >
+                    <div class="card-header">Проекты
+                      <span class="material-icons link create-project">add</span>
+                    </div>
+                    <div class="card-content card-content-padding" style="height: 112px;">
+                      <div class="list filter-list" page="1">
+                        <ul>
+                          {% for i, project in projects|enum %}
+                          <li index="{{i}}" style="display: {% if i < 3 %}{% else %}none{% endif %};">
+                            <a href="#" index="{{project.id}}" class="item-link item-content edit-project">
+                              <div class="item-media"><i class="icon icon-f7"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title">{{project.jira_tag}}</div>
+                                <div class="item-after"></div>
+                              </div>
+                            </a>
+                          </li>
+                          {% endfor %}
+                        </ul>
+                      </div>  
+                    </div>
+                    <div class="card-footer action-filter-list">
+                        <div style="width: 100%; text-align: center;">
+                          <a class="icon material-icons link back" style="float: left;">chevron_left</a>
+                          <span class="in" style="padding-right: 10px;">1</span> из <span class="max" style="padding-left: 10px;">{{projects|max3list}}</span>
+                          <a class="icon material-icons link next" style="float: right;">navigate_next</a>
+                        </div>
+                        </div>
+                  </div>
+            </div>
+            <div class="col {% if request.user.is_superuser and exist %}{% else %}simple{% endif %}">
+              <form method="POST" enctype="multipart/form-data" class="card card form-ajax-submit jira-exercise {% if jirafilter|len > 0 %}{% else %}simple{% endif %}"  action="./jira/exercise">
+                  {% csrf_token %}
+                  <div class="card-header">Периодическое задание
+                          <label class="toggle toggle-init color-green">
+                            {{ jiraexercise.enable }}
+                            <span class="toggle-icon"></span>
+                          </label>
+                  </div>
+                  <div class="card-content card-content-padding">
+                      <div class="list">
+                          <ul>
+                              <li>
+                                  <a class="item-link smart-select smart-select-init" data-open-in="popup">
+                                    {{ jiraexercise.filter }}
+                                    <div class="item-content">
+                                      <div class="item-inner">
+                                        <div class="item-title">Фильры</div>
+                                      </div>
+                                    </div>
+                                  </a>
+                              </li>
+                            <li>
+                              <a class="item-link smart-select smart-select-init" data-open-in="sheet">
+                                {{ jiraexercise.type }}
+                                <div class="item-content">
+                                  <div class="item-inner">
+                                    <div class="item-title">Тип</div>
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                            <li>
+                              <a class="item-link smart-select smart-select-init" data-open-in="sheet">
+                                {{ jiraexercise.time }}
+                                <div class="item-content">
+                                  <div class="item-inner">
+                                    <div class="item-title">Время старта</div>
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                  </div>
+                  <div class="card-footer">
+                    <button class="button" type="submit">сохранить</button>
+                  </div>
+                </form>
+              <!--div class="block block-strong no-padding" style="margin-top: 0px;margin-bottom: 0px;">
+                  <div id="demo-calendar-inline-container"></div>
+                </div -->
+          </div>
+          </div>
+                        
+</div>

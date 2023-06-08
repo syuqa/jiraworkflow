@@ -1,0 +1,49 @@
+<form method="POST" class="form-ajax-submit" rederect="/jira/" action="./jira/filter/{{id}}">
+{% csrf_token %}
+    <!-- Имя -->
+    <div class="row">
+        <div class="col-60">
+          <div class="list no-hairlines-md" style="margin-top: 15px;margin-bottom: 15px;">
+              <ul>
+                  <li class="item-content item-input">
+                      <div class="item-inner">
+                          <div class="item-input-wrap">
+                              {{form.name}}
+                              <span class="input-clear-button"></span>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </div>
+      <div class="col-20"></div>
+      <div class="col-20"></div>
+    </div>
+    <!-- JSQL -->
+    <div class="row">
+      <div class="col">
+        <div class="list inline-labels no-hairlines-md" style="margin: 0;">
+          <ul>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-input-wrap">
+                  {{form.jsql}}
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Кнопки -->
+    <div class="row-100">
+      <p class="segmented segmented-raised" style="
+              margin-bottom: -10px;
+              margin-left: -25px;
+              margin-right: -25px;
+              margin-top: 28px; ">
+      <button class="button close" style="border-radius: 0;height: 45px;">Отмена</button>          
+      <button class="button create" style="border-radius: 0;height: 45px;" type="submit">{% if id == 0 %}Создать{% else %}Сохранить{% endif %}</button>
+      </p>
+    </div>
+</form>
