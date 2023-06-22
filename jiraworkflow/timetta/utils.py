@@ -8,6 +8,12 @@ class SyncStatusException(Exception):
         self.trace = trace
     def __str__(self):
         return self.status
+    
+class DowloadCalendarException(Exception):
+    def __init__(self, request) -> None:
+        self.request = request
+    def __str__(self) -> str:
+        return self.request.status_code
 
 def get_children(meta):
     return [t[0][0] for t in json.loads(meta).get('children')]

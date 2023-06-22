@@ -1,4 +1,5 @@
 import re
+from django_logging import log as logger
 
 from datetime import datetime, timedelta
 from jinja2 import Template
@@ -17,16 +18,17 @@ class JiraTasks:
                 options={
                     'server': server.url
                     }, 
-                basic_auth=(server.username, server.password))
-        except JitaConnect.DoesNotExist:
+                basic_auth=(server.username, server.password), timeout=10)
+            logger.info({"JiraSunc": {"Jira connect server": {"server": server.url, "result": str(self.jira)}}})
+        except JitaConnect.DoesNotExist as e:
             raise Exception('JIRA: Отсутвуют настройки подключения')
 
-    def jsql_parse(self, data, user):
+    def jsql_parse(self, data, user, sdate=None, edate=None):
         # username, useremail, 
         # current_week_day_monday, current_week_day_tuesday, current_week_day_wednesday, current_week_day_thursday, current_week_day_friday, current_week_day_saturday, current_week_day_sunday
         # previous_week_day_monday, previous_week_day_tuesday, previous_week_day_wednesday, previous_week_day_thursday, previous_week_day_friday, previous_week_day_saturday, previous_week_day_sunday
         template = Template(data)
-        return template.render(**self.get_week_days(), username=user.username, useremail=user.email)
+        return template.render(**self.get_week_days(), sdate=sdate, edate=edate, username=user.username, useremail=user.email)
 
     def get_week_days(self, today=datetime.today()):
         return {
@@ -45,7 +47,7 @@ class JiraTasks:
             return user.user_filter.all()
         else:
             try:
-                task = JiraExercise.objects.get(name='synchronization_day_of_week')
+                task = JiraExercise.objects.get(name='jira_all_sync_once_a_week')
                 return task.filter.all()
             except JiraExercise.DoesNotExist:
                 return []
@@ -95,21 +97,25 @@ class JiraTasks:
         except KeyError as e:
             dict
 
-    def get_tasks(self, users):
+    def get_tasks(self, users, sdate=None, edate=None, filters=None):
         tasks = {}
+        logger.info({"JiraSunc": {"users": [user.username for user in users]}})
         for user in users:
-            filters = self.get_filters(user)
+            filters = self.get_filters(user) if filters else JiraFilters.objects.filter(id__in=filters)
+            logger.info({"JiraSunc": {"Get jira filters": {"user": user.username, "filters": [f.jsql for f in filters]}}})
             for filter in filters:
                 # print('Filter', filter)
-                jsql = self.jsql_parse(filter.jsql, user)
+                jsql = self.jsql_parse(filter.jsql, user, sdate, edate)
                 # print('JSQL', jsql)
+                logger.info({"JiraSunc": {"Search user issues": {"user": user.username, "filter_jinja": filter.jsql, "filter_jsql": jsql}}})
                 issues_list = self.jira.search_issues(jsql)
                 # print('ISSUES', issues_list)
+                logger.info({"JiraSunc": {"Tasks search worklog": {"user": user.username, 'issue_list': str(issues_list), }}})
                 for issue in issues_list:
                     # print('worklogs:', issue.fields.worklog.worklogs)
                     worklog = self.get_worksheets(issue.fields.worklog.worklogs, user)
                     project = issue.get_field('project').key
-
+                    logger.info({"JiraSunc": {"Get worklog":{"user": user.username, "issue": str(issue), "worklog": str(worklog)}}})
                     if worklog:
                         # print(worklog)
                         for date, time in worklog.items():
@@ -126,7 +132,7 @@ class JiraTasks:
                                     "link": issue.permalink()
                                 }
                             # print('ISSUE INFO', issue_info)
-
+                            logger.info({"JiraSunc": {"Append list issues info": {"user": user.username, "useremail": user.email, "week": d, "project": project, "issue": issue.key, "issue_info": issue_info}}})
                             try:
                                 worklog = tasks[user.email][d][project][issue.key]
                                 # print(f'WORKLOG: {worklog}')
@@ -149,5 +155,4 @@ class JiraTasks:
                                 # Задача
                                 elif e.args[0] == issue.key:
                                     tasks[user.email][d][project][issue.key] =  issue_info
-
         return tasks

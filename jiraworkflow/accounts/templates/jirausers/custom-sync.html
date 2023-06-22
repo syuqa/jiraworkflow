@@ -1,0 +1,141 @@
+{% load static %}
+<div class="page">
+    <div class="navbar">
+      <div class="navbar-bg"></div>
+      <div class="navbar-inner">
+        <div class="left">
+              <a class="link">
+                  <img width="100px" src="/static/img/redis.png"  />
+              </a>
+            </div>
+        <div class="title" style="text-align: center;">Выборочная синхронизация</div>
+        <div class="right">
+            <a href="/profile/" class="material-icons link">close</a>
+        </div>
+      </div>
+    </div>
+        
+    <!-- Контент -->
+
+    <div class="page-content">
+      <div class="block grid-resizable-demo" style="height: 100%;margin-bottom: 0px;margin-top: 0px;padding-top: 15px;">
+        <div class="row" style="height: inherit;">
+          <div class="col-20 resizable resizable-fixed" style="height: inherit;">
+            <div class="card" style="margin: 0px;">
+              <div class="card-content">
+                <div class="block block-strong no-padding" style="margin-bottom: 0px;"><div id="demo-calendar-inline-container"></div></div>
+              </div>
+            </div>
+            <div class="card" style="margin-left: 0px;margin-right: 0px;">
+              <div class="card-content">
+                <div class="list" style="margin-top: 0px;">
+                  <ul>
+                      <li>
+                        <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title">Яндекс календарь</div>
+                            <div class="item-after">
+                                <label class="toggle toggle-init">
+                                  <input name="mitings" type="checkbox" />
+                                    <span class="toggle-icon"></span>
+                                  </label>
+                            </div>
+                        </div>
+                        </div>
+                    </li>
+                      <li>
+                          <a class="item-link smart-select smart-select-init smart-select-filter"  data-open-in="popup">
+                              {{ filters.filter }}
+                              <div class="item-inner" style="padding-left: 15px;">
+                                <div class="item-title">Фильры</div>
+                              </div>
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+              <button class="col button button-raised button-fill button-load" style="border-radius: 0;">Загрузить список</button>
+              </div>
+            </div>
+            <div class="block block-strong no-padding simple">
+              <p class="segmented segmented-raised" style="margin-bottom: 0px;border-radius: 0;">
+                <button class="button" style="border-radius: 0;">замена</button>
+                <button class="button" style="border-radius: 0;">мердж</button>
+                <button class="button button-active" style="border-radius: 0;">отдельно</button>
+              </p>
+              <button class="col button button-raised button-fill color-green" style="border-radius: 0px 0px 4px 4px;">Синхронизация</button>
+            </div>
+        </div>
+        <div class="col-80 resizable">
+          <div style="background: url('{% static 'img/cloud_sync.webp' %}') no-repeat;width: 400px;height: 400px;background-size: 100%;margin: auto;"></div>
+            <font class="start-info" style="width: 100%;text-align: center;display: block;">Для загрузки списка задач, выбирите диапазон дат в календарь и фильры, затем нажмите "Загрузить список"</font>
+            <div class="process-load" style="display: none;">
+              <p style="margin: auto;text-align: center;" class="">Загружаю, подождите</p>
+              <p><span style="width: 100px;margin: auto;" id="inline-progressbar" class="progressbar-infinite color-multi"></span></p>
+            </div>
+          </div>
+      </div>
+    </div>
+
+      <!-- div style="flex-direction: column;align-items: flex-start;display: flex;height: 100%;" class="row">
+          <div class="col range-data" style="margin-top: auto;margin-bottom: auto;transition-duration: 1s;display: flex;">
+            <div class="card" style="width: 400px;margin: auto;margin-top: -40px;margin-bottom: 0px;margin-right: 10px;">
+              <div class="card-header">Даты</div>
+              <div class="card-content card-content-padding">
+                <div class="list" style="height: 340px;">
+                  <ul>
+                      {% for filter in filters %}
+                      <li>
+                          <div class="item-content">
+                          <div class="item-media">
+                              <span class="material-icons">
+                                  filter_alt
+                              </span>
+                          </div>
+                          <div class="item-inner">
+                              <div class="item-title">{{filter.name}}</div>
+                              <div class="item-after">
+                                  <label class="toggle toggle-init">
+                                      <input id="{{filter.id}}" name="filter" type="checkbox" />
+                                      <span class="toggle-icon"></span>
+                                    </label>
+                              </div>
+                          </div>
+                          </div>
+                      </li>
+                      {% endfor %}
+                  </ul>
+              </div>
+              </div>
+              <div class="card-footer">
+                <div class="list" style="width: 100%;">
+                  <ul>
+                      <li>
+                          <div class="item-content">
+                            <div class="item-inner" style="padding: 0px;">
+                                <div class="item-title">Митинги</div>
+                                <div class="item-after">
+                                    <label class="toggle toggle-init">
+                                        <input name="mitings" type="checkbox" />
+                                        <span class="toggle-icon"></span>
+                                      </label>
+                                </div>
+                            </div>
+                          </div>
+                      </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col range-data" style="margin-top: auto;margin-bottom: auto;transition-duration: 1s;display: flex;">
+            <div class="card" style="width: 400px;margin: auto;margin-top: -40px;margin-bottom: 0px;margin-left: 10px;">
+              <div class="card-header"></div>
+              <div class="card-content card-content-padding">
+                  <div class="block block-strong no-padding"><div id="demo-calendar-inline-container"></div></div>
+              </div>
+              <div class="card-footer"></div>
+            </div>
+          </div>
+      </div -->
+    </div>                
+  </div>

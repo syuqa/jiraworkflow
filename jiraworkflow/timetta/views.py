@@ -74,7 +74,22 @@ def projects(request, id):
         context = {
             'form': form,
             'id': id,
-            'project_list': project_list.get('value')
+            'project_list': project_list.get('value'),
+            'totip_meeting_summary': """
+            <h3>Заголовок события в Я.Календаре</h3>
+                <p>Поддерживает следующие форматы:</p>
+              <ol>
+                <li>Заголовоки целеком через точку с запятой - ";"</li>
+                <li>Ключивые слова, через запяту</li>
+                <li>Кортеж ключевых слов, через ;</li>
+              </ol>
+            <h3>Примеры</h3>
+            <ol>
+                <li><i>Встерча по проекту SMPL;Статус по проету SMPL</i></li>
+                <li><i>встреча,smpl</i></li>
+                <li><i>встреча,smpl;статус,smpl</i></li>
+            </ol>
+            """
         }
 
         return render(request, 'timetta/project_form.html', context)

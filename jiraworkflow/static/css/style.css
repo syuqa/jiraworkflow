@@ -175,3 +175,11 @@
 .jsoneditor-repair {
   display: none !important;
 }
+
+.none {
+  display: none !important;
+}
+
+.page-content {
+  background-color: #f8f8fa !important;
+}

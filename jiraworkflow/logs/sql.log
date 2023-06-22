@@ -1,0 +1,1 @@
+{"INFO": {"1687286879": {"duration": 0.75, "query": "SELECT \"django_celery_beat_periodictasks\".\"ident\", \"django_celery_beat_periodictasks\".\"last_update\" FROM \"django_celery_beat_periodictasks\" WHERE \"django_celery_beat_periodictasks\".\"ident\" = 1 LIMIT 21"}}}

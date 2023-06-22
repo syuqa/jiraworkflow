@@ -6,11 +6,15 @@
 		<div class="navbar-bg"></div>
 		<div class="navbar-inner">
 		  <div class="left">
-            <a class="link" href="/jira/">
+            <a class="link" href="#">
                 <img src="{% static 'img/jira.png' %}"  />
             </a>
           </div>
-		  <div class="title" style="text-align: center;">Настройка профиля Jira</div>
+		  <div class="title" style="text-align: center;display: flex;width: 100%;">Настройка профиля Jira
+        <span style="padding-left: 10px;padding-top: 2px;opacity: 0.3;" class="item-link material-icons refresh hover-op" page="/jira/">
+          refresh
+          </span>
+      </div>
 		  <div class="right">
             <div>
                 <a class="link menu-jira" href="#" {% if request.user.is_superuser %}superuser{% endif %}>
@@ -179,14 +183,30 @@
               </thead>
               <tbody>
                 {% for task in TaskResult %}
+                <div style="display: none;">STATUS {{task.status}}</div>
                 {% get_status_sync task.task_id as status %}
                 <tr>
                   <td class="datetime-cell">{{ task.date_created }}</td>
                   <td class="datetime-cell">{{ task.date_done }}</td>
                   <td class="label-cell">{{ task.task_name }}</td>
                   <td class="label-cell">{{ task.task_kwargs|runuser }}</td>
-                  <td class="label-cell"><span id="{{task.task_id}}" class="badge link {{ status.status|statcolor }}" >{{ status.status|rustatus }}</span></td>
-                  <td class="actions-cell"><a href="/worklog/{{task.task_id}}" class="material-icons profile-link icon link hover-op worktask-details" style="display: block;opacity: 0.5;">subject</span></td>
+                  <td class="label-cell">
+                    <a href="#" id="{{task.task_id}}" class="badge item-link {{ status.status|statcolor }}"  data-popup=".sync-{{task.task_id}}-popup">{{ status.status|rustatus }}</a>
+                    {% if task.status == "FAILURE" %}
+                    <div class="popup popup-sync-status sync-{{task.task_id}}-popup">
+                      <div class="view">
+                        <div class="page">
+                          <div class="page-content">
+                            <input style="display: none;" type="text" name="task-status" value="{{status.status}}" />
+                            <div style="height:100%;width:100%;display:inline-block;" required="" id="id_json" class=""></div>
+                            <textarea id="id_json_textarea" name="json" required="" style="display: none" >{{status.result}}</textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td class="actions-cell"><a href="/worklog/{{task.task_id}}/jira" class="material-icons profile-link icon link hover-op worktask-details {% if task.status == 'FAILURE' %}none{% endif %}" style="display: block;opacity: 0.5;">subject</span></td>
                 </tr>
                 {% endfor %}  
                 <tr>

@@ -26,6 +26,10 @@ jinja2 = "*"
 django-json-widget = "*"
 django-codemirror2 = "*"
 djangocodemirror = "*"
+python-json-logger = "*"
+django-logging-json = "*"
+icalendar = "*"
+recurring-ical-events = "*"
 
 [dev-packages]
 tox = "*"

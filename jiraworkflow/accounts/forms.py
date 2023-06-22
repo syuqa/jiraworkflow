@@ -112,3 +112,12 @@ class JsonEditor(forms.Form):
         label="JSON", 
         required=True,
         config_name="javascript")
+    
+class YandexCalendarForm(forms.ModelForm):
+     class Meta:
+        model = CustomUser
+        fields = ('synchronization_meetings', 'synchronization_meetings_key')
+        widgets = {
+            'synchronization_meetings': forms.CheckboxInput(),
+            'synchronization_meetings_key': forms.TextInput(attrs={'placeholder': 'Токен доступа', 'type' :'password'}),
+        }

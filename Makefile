@@ -16,6 +16,9 @@ stop:
 restart:
 	docker-compose restart
 
+shell:
+	docker-compose run --rm app jiraworkflow/manage.py shell
+
 createsuperuser:
 	docker-compose run --rm app jiraworkflow/manage.py createsuperuser
 

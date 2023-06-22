@@ -14,11 +14,13 @@ class TimettaConnectForm(forms.ModelForm):
 class TimettaProjectsForm(forms.ModelForm):
     class Meta:
         model = TimettaProjects
-        fields = ('jira_tag', 'project_id', 'task_id')
+        fields = ('jira_tag', 'project_id', 'task_id', 'meeting_summary', 'meeting_task_id')
         widgets = {
-            'jira_tag': forms.TextInput(attrs={'placeholder':'Тег'}),
+            'jira_tag': forms.TextInput(attrs={'placeholder':'Тег проекта'}),
             'project_id': forms.TextInput(attrs={'placeholder': 'ID проекта'}),
-            'task_id': forms.TextInput(attrs={'placeholder': 'ID задачи'}),
+            'task_id': forms.TextInput(attrs={'placeholder': 'ID задачи', 'class': 'timetta_task_id'}),
+            'meeting_summary': forms.TextInput(attrs={'placeholder': 'Заголовок'}),
+            'meeting_task_id': forms.TextInput(attrs={'placeholder': 'ID задачи', 'class': 'timetta_task_id'})
         }
 
 class TimettaSimple(forms.ModelForm):

@@ -59,20 +59,20 @@ def jira(request):
 def filter(request, id):
     if request.method == 'POST':
         form = JiraFiltersForm(request.POST)
-        if form.is_valid():
+        try:
             if id == 0:
                 form.save()
             else:
                 try:
-                    filtr = JiraFilters.objects.get(id=id)
-                    f = JiraConnectForm(request.POST, instance=filtr)
+                    filtr = JiraFilters.objects.get(id=int(id))
+                    f = JiraFiltersForm(request.POST, instance=filtr)
                     f.save()
                 except JiraFilters.DoesNotExist as e:
-                    print(e)
+                    return JsonResponse({"msg": e}, status=500,content_type="application/json")
 
             return HttpResponse(status=200)
-        else:
-            return JsonResponse({"msg": form.errors.as_data()}, status=500,content_type="application/json")
+        except BaseException as e:
+            return JsonResponse({"msg": e}, status=500,content_type="application/json")
         
     else:
         try:
@@ -125,15 +125,21 @@ def exercis_enable(request):
 def worklog(request, task):
     users = []
     try:
-        users = TaskResult.objects.get(task_id=task).result
-        
+        u = TaskResult.objects.get(task_id=task).result
+        if request.user.is_superuser:
+            users = json.loads(u)
+        else: 
+            for usename, data in json.loads(u).items():
+                print('USER', usename, request.user.email)
+                if usename == request.user.email:
+                    users = {usename: data}
     except TaskResult.DoesNotExist as e:
         print(task, 'not exsist', e)
     context = {
         'task': task,
-        'users': [*json.loads(users).keys()],
-        'weeks': { user: [*week.keys()] for user, week in json.loads(users).items()},
-        'data': json.loads(users),
+        'users': [*users.keys()],
+        'weeks': { user: [*week.keys()] for user, week in users.items()},
+        'data': users,
         'jsoneditor': JsonEditorForm()
     }
     print(context)

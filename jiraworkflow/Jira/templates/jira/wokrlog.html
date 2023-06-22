@@ -86,6 +86,32 @@
                         </div>
                       </div>
                     </li>
+                    {% get_meetings_task task user as meetings %}
+                    {% for meeting in meetings %}
+                      <li style="display: none;" user="{{user}}" week="{{week}}">
+                        <a href="#" class="item-link item-content popup-open" data-popup=".sync-{{meeting.task_id}}-popup">
+                          <div class="item-media"><span class="badge link {{ meeting.status|statcolor }}">{{meeting.status|rustatus}}</span></div>
+                          <div class="item-inner">
+                            <div class="item-title"><div class="link" href="{{data.link}}">Митинги</div></div>
+                          </div>
+                          <!-- div>{{ status.result }}</div-->
+                        </a>
+                        <div class="popup popup-sync-status sync-{{meeting.task_id}}-popup">
+                          <div class="view">
+                            <div class="page">
+                              <div class="page-content">
+                                <input style="display: none;" type="text" name="task-status" value="{{meeting.status}}" />
+                                <div style="height:100%;width:100%;display:inline-block;" required="" id="id_json" class=""></div>
+                                <textarea id="id_json_textarea" name="json" required="" style="display: none" >{{meeting.result}}</textarea>
+                                <!--form style="height: 100%;">
+                                  <textarea id="json" name="code">{{status.trace}}</textarea>
+                                </form-->
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    {% endfor %}
                   {% endfor %}
                 {% endfor %}
               {% endfor %}

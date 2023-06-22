@@ -1,7 +1,7 @@
 {% load static %}
 {% load account socialaccount %}
-<div class="page no-navbar no-toolbar no-swipeback login-screen-page">
-    <div class="page-content login-screen-content">
+<div class="page no-navbar no-toolbar no-swipeback login-screen-page" style="background-image: url('{% static 'img/workspace.webp' %}');background-size: 100%;">
+    <div class="page-content login-screen-content" style="background: 0 !important">
       <div class="login-screen-title">Авторизация</div>
       <form method="post" action="/accounts/login">
         {% csrf_token %}

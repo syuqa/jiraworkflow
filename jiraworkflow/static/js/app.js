@@ -16,6 +16,52 @@ function saved(){
   }).open()
 }
 
+function popup_info(el){
+  console.log(el.find('.popup-sync-status'))
+  el.on('popup:closed', '.popup-sync-status', function (e, popup) {
+    app.popup.destroy('.popup')
+  })
+  
+  el.on('popup:open','.popup-sync-status', function (e) {
+    
+    console.log(e)
+    let status = $(e.target).find('input[name="task-status"]')
+  
+    if ($(e.target).find(".jsoneditor").length == 0){
+      var container = $(e.target).find("#id_json")[0];
+      var textarea = $(e.target).find("#id_json_textarea");
+  
+      var options = {"mode": "code", "sort": false, "search": false, "readOnly": true, "disable_properties": true};
+      var editor = new JSONEditor(container, options);
+      app.editor = editor
+      var json = textarea.val();
+      editor.set(JSON.parse(json));
+    }
+  
+    // Только чтение
+    $(e.target).find(".ace_text-input").prop('readonly', true);
+  
+    // Дабавляем кнопку закрыть
+    let close = $(e.target).find(".jsoneditor-poweredBy")
+        close.replaceWith('<a class="jsoneditor-poweredBy popup-close">Закрыть</a>')
+    
+    // Цвет рамки взависимости от статуса
+    let title = $$(e.target).find(".jsoneditor-menu")
+    let jedit = $$(e.target).find(".jsoneditor")
+  
+    if (status.val() == 'SUCCESS'){  
+      title.css('background', 'green')
+      title.css('border-bottom', '1px solid green')
+      jedit.css('border', 'thin solid green')
+    }else if (status.val() == 'FAILURE'){
+      title.css('background', 'crimson')
+      title.css('border-bottom', '1px solid crimson')
+      jedit.css('border', 'thin solid crimson')
+    }
+  });
+}
+
+
 // Профиль
 routes.push({
   path: '/profile/',
@@ -28,9 +74,96 @@ routes.push({
   url: './accounts/login/out'
 })
 
+
+// Выборочная синхронизация
+routes.push({
+  path: '/custom-sync/',
+  url: './users/synchronization/custom', 
+  on: {
+    pageInit: function(event, page){
+      var monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+      var calendarInline = app.calendar.create({
+          containerEl: '#demo-calendar-inline-container',
+          value: [new Date()],
+          weekHeader: false,
+          rangePicker: true,
+          renderToolbar: function () {
+          return `
+          <div class="toolbar calendar-custom-toolbar no-shadow">
+              <div class="toolbar-inner">
+              <div class="left">
+                  <a href="#" class="link icon-only"><i class="icon icon-back ${app.theme === 'md' ? 'color-black' : ''}"></i></a>
+              </div>
+              <div class="center"></div>
+              <div class="right">
+                  <a href="#" class="link icon-only"><i class="icon icon-forward ${app.theme === 'md' ? 'color-black' : ''}"></i></a>
+              </div>
+              </div>
+          </div>
+          `;
+          },
+          on: {
+              init: function (c) {
+                      $('.calendar-custom-toolbar .center').text(monthNames[c.currentMonth] + ', ' + c.currentYear);
+                      $('.calendar-custom-toolbar .left .link').on('click', function () {
+                          calendarInline.prevMonth();
+                      });
+                      $('.calendar-custom-toolbar .right .link').on('click', function () {
+                          calendarInline.nextMonth();
+                      });
+                  },
+              monthYearChangeStart: function (c) {
+                      $('.calendar-custom-toolbar .center').text(monthNames[c.currentMonth] + ', ' + c.currentYear);
+                  },
+              calendarChange: function(c){
+                  if (c.params.rangePicker) {
+                      if (c.value.length > 1){
+                      }
+                  }else{
+                  }
+              },
+              dayClick: function(c){
+                  },
+              
+          }
+      });
+      app.calendarInline = calendarInline
+
+      page.$el.on('click', '.button-load', function(){
+        let dates = app.calendarInline.getValue()
+        if (dates.length > 1){
+          let filters = app.smartSelect.get('.smart-select-filter')
+          if (filters.getValue().length > 0){
+              page.$el.find('.process-load').css('display', '')
+              page.$el.find('.start-info').css('display', 'none')
+          }else{
+            app.notification.create({
+              title: 'Синхронизация',
+              titleRightText: 'ошибка',
+              subtitle: 'Произошла ошибка',
+              text: 'Выбирете хотябы один фильтр',
+              closeTimeout: 3000,
+            }).open()
+          }
+        }else{
+          app.notification.create({
+            title: 'Синхронизация',
+            titleRightText: 'ошибка',
+            subtitle: 'Произошла ошибка',
+            text: 'Выбирете диапазон дат в календаре',
+            closeTimeout: 3000,
+          }).open()
+    
+        }
+      })
+    }
+  }
+
+})
+
 // Radis task list
 routes.push({
-  path: '/worklog/:task',
+  path: '/worklog/:task/:backpage',
   content: `
       <div class="page">
         <div class="navbar">
@@ -55,10 +188,14 @@ routes.push({
   `,
   on: {
     pageInit: function(event, page){
+
       let task = page.route.params.task
+      let backpage = page.route.params.backpage
+      
+      page.$el.find('.right a').attr('href', `/${backpage}/`)
+      
       app.request.get(`./jira/worklog/${task}`, function(request){
         page.$el.find('.page-content').html(request)
-
         page.$el.on('click', '.list-users li a', function(){
           let user = $(this).attr('user')
           // color
@@ -80,65 +217,10 @@ routes.push({
           page.$el.find(`.list-tasks li`).css('display', 'none')
           page.$el.find(`.list-tasks li[user="${user}"][week="${week}"]`).css('display', 'block')
         })
-        //
-        $$('.popup-sync-status').on('popup:closed', function (e, popup) {
-          app.popup.destroy('.popup')
-        })
-        $$('.popup-sync-status').on('popup:open', function (e) {
-
-          let status = $(e.target).find('input[name="task-status"]')
-
-          if ($(e.target).find(".jsoneditor").length == 0){
-            var container = $(e.target).find("#id_json")[0];
-            var textarea = $(e.target).find("#id_json_textarea");
-
-            var options = {"mode": "code", "sort": false, "search": false, "readOnly": true, "disable_properties": true};
-            var editor = new JSONEditor(container, options);
-            app.editor = editor
-            var json = textarea.val();
-            editor.set(JSON.parse(json));
-          }
-
-          // Только чтение
-          $(e.target).find(".ace_text-input").prop('readonly', true);
-
-          // Дабавляем кнопку закрыть
-          let close = $(e.target).find(".jsoneditor-poweredBy")
-              close.replaceWith('<a class="jsoneditor-poweredBy popup-close">Закрыть</a>')
-          
-          // Цвет рамки взависимости от статуса
-          let title = $$(e.target).find(".jsoneditor-menu")
-          let jedit = $$(e.target).find(".jsoneditor")
-
-          if (status.val() == 'SUCCESS'){  
-            title.css('background', 'green')
-            title.css('border-bottom', '1px solid green')
-            jedit.css('border', 'thin solid green')
-          }else if (status.val() == 'FAILURE'){
-            title.css('background', 'crimson')
-            title.css('border-bottom', '1px solid crimson')
-            jedit.css('border', 'thin solid crimson')
-          }
-
-          /*
-          var json_codemirror = CodeMirror.fromTextArea(
-              $(e.target).find('#json')[0],
-              {
-                "matchBrackets": true,
-                "mode": "application/json",
-                "continueComments": "Enter",
-                "fullScreen": true,
-                "extraKeys": {"Ctrl-Q": "toggleComment"}, 
-                "lineNumber": false, 
-                "indent": 4,
-                "readOnly": true
-              }
-          );
-          console.log(json_codemirror)
-          */
-        });
+        console.log('popup action init')
+        popup_info(page.$el)
+        //        
       })
-      
     }
   }
 })
@@ -151,6 +233,7 @@ routes.push({
     pageInit: function(event, page){
 
       page.$el.on('formajax:success', '.jira-account', function() {
+        let rederect = $(this).attr('redirect')
         //
         app.toast.create({
           icon: '<i class="material-icons">task_alt</i>',
@@ -159,6 +242,9 @@ routes.push({
           closeTimeout: 2000,
         }).open() 
         //
+        if (rederect){
+          navigate(rederect)
+        }
       })
       
       var dialog_create = (content) => {
@@ -169,8 +255,28 @@ routes.push({
         on: {
           opened: function (dialog) {
 
-            jQuery('#project_list').mCustomScrollbar({advanced:{ updateOnSelectorChange: "li", autoScrollOnFocus: "ul li", }})
-            jQuery('#task_list').mCustomScrollbar({advanced:{ updateOnSelectorChange: "li", autoScrollOnFocus: "ul li" }})
+            app.tooltip.create({
+              targetEl: '.tooltip-mitting-summary',
+              text: `
+              <h3>Заголовок события в Я.Календаре</h3>
+                <p>Поддерживает следующие форматы:</p>
+              <ol>
+                <li>Заголовоки целеком через точку с запятой - ";"</li>
+                <li>Ключивые слова, через запяту ","</li>
+                <li>Кортеж ключевых слов, через ";"</li>
+              </ol>
+              <h3>Примеры</h3>
+              <ol>
+                  <li><i>Встерча по проекту SMPL;Статус по проету SMPL</i></li>
+                  <li><i>встреча,smpl</i></li>
+                  <li><i>встреча,smpl;статус,smpl</i></li>
+              </ol>
+              `
+            })
+            
+
+            jQuery('#project_list').mCustomScrollbar({advanced:{ updateOnSelectorChange: "li", autoScrollOnFocus: "ul li", updateOnContentResize:true}})
+            jQuery('#task_list').mCustomScrollbar({advanced:{ updateOnSelectorChange: "li", autoScrollOnFocus: "ul li" , updateOnContentResize:true}})
 
             dialog.$el.find('input').change()
             dialog.$el.find('textarea').change()
@@ -189,10 +295,14 @@ routes.push({
               $('.dialog').remove()
             })
 
+            // 
             dialog.$el.on('click', '.get-task-list', function(){
               let project = $$(this).attr('project')
+              let $meeting_task_el = dialog.$el.find("#id_meeting_task_id")
               let $task_el = dialog.$el.find("#id_task_id")
                   $task_el.val('')
+                  $meeting_task_el.val('')
+                  $meeting_task_el.change()
                   $task_el.change()
               dialog.$el.find('.get-task-list').css('background', '')
               $$(this).css('background', 'aliceblue')
@@ -205,8 +315,19 @@ routes.push({
               })
             })
 
+            dialog.$el.on('click', '.timetta_task_id', function(){
+              console.log(this.id)
+              app.project_mode_input = this.id
+              dialog.$el.find(`input[type="radio"]`).prop('checked', false)
+              if (this.value.length > 0){
+                jQuery('#task_list').mCustomScrollbar('scrollTo', `li[task="${this.value}"]`);
+                let $el_task = dialog.$el.find(`input[value="${this.value}"][type="radio"]`)
+                    $el_task.prop('checked', true);
+              }
+            })
+
             dialog.$el.on('change', 'input[name="project-task"]', function(){
-            let $el = dialog.$el.find("#id_task_id")
+            let $el = dialog.$el.find(`#${app.project_mode_input || 'id_task_id'}`)
                 $el.val(this.value)
                 $el.change()
             })
@@ -446,6 +567,12 @@ routes.push({
   reloadAll: true,
   on: {
     pageInit: function (event, page) {
+      // refresh
+      page.$el.on('click', '.refresh', function(){
+        let page = $$(this).attr('page')
+        console.log('reload', page)
+        navigate(page)
+      });
       // Принудительный запуск синхронизации
       page.$el.on('click', '.run-sync', function () {
         app.dialog.confirm('Запустить выполнение задания?', 'Запуск задания', function () {
@@ -684,6 +811,8 @@ var app = new Framework7({
     routes: routes,
     on: {
       pageInit: function () {
+        console.log('APP INIT')
+        popup_info($(document))
         // buttons 
       }
     }
@@ -815,3 +944,5 @@ $$(document).on('click', '.menu-timetta', function () {
   }
   
 });
+
+

@@ -38,6 +38,7 @@ def startsh(text, tag):
 @register.filter(name='rustatus')
 def rustatus(status):
     ru = {
+        "FAILURE_ALL": "ОШИБКА",
         "SUCCESS": "ВЫПОЛНЕНО",
         "FAILURE": "ОШИБКА",
         "PENDING": "ОЖИДАЕТ",
@@ -52,7 +53,7 @@ def rustatus(status):
 def statcolort(status):
     color = {
         "SUCCESS": "color-green",
-        "FAILURE": "color-red tooltip-init",
+        "FAILURE": "color-red tooltip-init popup-open",
         "PENDING": "color-orange",
         "RETRY": "color-blueviolet",
         "REVOKED": "color-grey",
@@ -141,11 +142,27 @@ def check_status_child(parent, task_kwargs=None):
         raise SyncTaskChildrenNone(parent)
 
 @register.simple_tag
-def get_task_children(task, user):
+def get_task_children(task, user, name=None):
     try:
         _task = TaskResult.objects.get(task_id=task)
-        print(task, user, _task)
-        return TaskResult.objects.filter(task_id__in=get_children(_task.meta), task_kwargs__contains=user)
+        if name:
+            return TaskResult.objects.filter(task_id__in=get_children(_task.meta), task_kwargs__contains=user, task_name=name)
+        else:
+            return TaskResult.objects.filter(task_id__in=get_children(_task.meta), task_kwargs__contains=user)
+    except TaskResult.DoesNotExist:
+        return []
+
+
+@register.simple_tag
+def get_meetings_task(task, user):
+    try:
+        task = TaskResult.objects.get(task_id=task)
+        user_task = TaskResult.objects.filter(task_id__in=get_children(task.meta), task_kwargs__contains=user)
+        if user_task.exists():
+            meetings_task = TaskResult.objects.filter(task_id__in=get_children(user_task.first().meta), task_name='Timetta: Синхронизация митингов')
+            return meetings_task
+        else:
+            return []
     except TaskResult.DoesNotExist:
         return []
 

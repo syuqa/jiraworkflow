@@ -104,7 +104,7 @@
                         </div>
                   </div>
             </div>
-            <div class="col {% if request.user.is_superuser and exist %}{% else %}simple{% endif %}">
+            <div class="col simple" style="opacity: 0;">
               <form method="POST" enctype="multipart/form-data" class="card card form-ajax-submit jira-exercise {% if jirafilter|len > 0 %}{% else %}simple{% endif %}"  action="./jira/exercise">
                   {% csrf_token %}
                   <div class="card-header">Периодическое задание

@@ -12,6 +12,7 @@ from django_celery_results.models import TaskResult
 from accounts.models import CustomUser
 from Jira.models import JiraExercise
 from Jira.forms import JiraExerciseForm
+from Jira.processor import JiraTasks
 from .forms import *
 
 logger = logging.getLogger(__name__)
@@ -74,11 +75,23 @@ def profile(request):
             'syncweektime':{
                 'custom': UserSyncWeekTime(instance=request.user),
                 'global': g
-            } 
+            }
         },
+        'meetings': YandexCalendarForm(instance=request.user),
         'TaskResult': TaskResult.objects.filter(task_name='Jira: Выгрузка задач')
     }
     return render(request, 'jirausers/profile.html', context)
+
+@login_required
+def yandex_calendar(request):
+    if request.method == 'POST':
+        try:
+            form = YandexCalendarForm(request.POST, instance=request.user)
+            form.save()
+            return HttpResponse(status=200)
+        except Exception as e:
+            return JsonResponse({"msg": str(e)}, status=500, content_type="application/json") 
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def users(request):
@@ -185,3 +198,17 @@ def usersynchronization(request, id):
             return JsonResponse({"msg": form.errors.as_data()}, status=500,content_type="application/json")
 
     
+@login_required
+def custom(request):
+    if request.method == 'GET':
+        context = {
+            "filters": GlobalSyncFiters()
+        }
+        return render(request, 'jirausers/custom-sync.html', context)
+
+@login_required
+def custom_sunc_list(request, sdate, edate):
+    if request.method == 'GET':
+        context = {
+        }
+        return render(request, 'jirausers/custom-sunc-list.html', context)

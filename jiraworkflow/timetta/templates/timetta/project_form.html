@@ -5,11 +5,24 @@
         <div class="col-20">
             <div class="list no-hairlines-md" style="margin-top: 15px;margin-bottom: 15px;">
                 <ul>
-                    <li class="item-content item-input" >
-                        <div class="item-inner">
-                            <div class="item-input-wrap">
+                    <li class="item-content item-input" style="padding-left: 0px;">
+                        <div class="item-inner" style="margin-left: 0px;">
+                            <div class="item-input-wrap" style="display: flex;">
+                                <div class="item-media">
+                                    <img src="/static/img/jira.png" class="icon" style="width: 22px;">
+                                  </div>
                                 {{form.jira_tag}}
                                 <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input" style="padding-left: 0px;">
+                        <div class="item-inner" style="margin-left: 0px;">
+                            <div class="item-input-wrap simple" style="opacity: 1;display: flex;">
+                                <div class="item-media">
+                                    <img src="/static/img/yacalendar.png" class="icon" style="width: 18px;padding-left: 4px;">
+                                  </div>
+                                <input type="text" value="Митинги">
                             </div>
                         </div>
                     </li>
@@ -27,6 +40,16 @@
                             </div>
                         </div>
                     </li>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-input-wrap" style="display: flex;">
+                                {{form.meeting_summary}}
+                                <span class="icon link material-icons tooltip-mitting-summary" style="font-size: 18px;margin-top: 12px;">
+                                    help
+                                </span>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -37,6 +60,14 @@
                         <div class="item-inner">
                         <div class="item-input-wrap">
                             {{form.task_id}}
+                            <span class="input-clear-button"></span>
+                        </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input" >
+                        <div class="item-inner">
+                        <div class="item-input-wrap">
+                            {{form.meeting_task_id}}
                             <span class="input-clear-button"></span>
                         </div>
                         </div>

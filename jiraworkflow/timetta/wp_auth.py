@@ -53,6 +53,7 @@ class WPAuth:
 
     def get_auth_header(self):
         auth_token = self.get_auth_token()
+        print('AUTH TOKEN: ', auth_token)
         if auth_token is not None:
             return {"Authorization": f"Bearer {auth_token}"}
         return None
@@ -68,7 +69,10 @@ class WPAuth:
     def get_auth_data_from_account(self) -> dict or None:
         try:
             account = TimettaConnect.objects.get(id=1)
-            return account.tokens
+            if len(account.tokens.keys()) > 0:
+                return account.tokens
+            else:
+                return None
         except TimettaConnect.DoesNotExist:
             return None
 

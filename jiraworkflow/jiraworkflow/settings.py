@@ -75,9 +75,11 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_celery_beat',
     'multiselectfield',
+    'django_logging',
 ]
 
 MIDDLEWARE = [
+    'django_logging.middleware.DjangoLoggingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -273,26 +275,39 @@ REST_FRAMEWORK = {
 }
 """
 
+DJANGO_LOGGING = {
+    "CONSOLE_LOG": True,
+    "IGNORED_PATHS" : ['/admin', '/static', '/favicon.ico'],
+}
+
+"""
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    "filters": {
+        "add_gae_log_level": {
+            "()": "jiraworkflow.logging.AddGaeSeverityLevel"}
+            },
     'formatters': {
         'console': {
             'format': '%(name)-12s %(levelname)-8s %(message)s'
         },
         'file': {
             'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
-        }
+        },
+        "json": {"()": "pythonjsonlogger.jsonlogger.JsonFormatter"}
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'console'
+            "formatter": "json",
+            "filters": ["add_gae_log_level"],
         },
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'formatter': 'file',
+            "formatter": "json",
+            "filters": ["add_gae_log_level"],
             'filename': 'debug.log'
         }
     },
@@ -303,5 +318,7 @@ LOGGING = {
         }
     }
 }   
+
+"""
 
 SITE_ID = 1

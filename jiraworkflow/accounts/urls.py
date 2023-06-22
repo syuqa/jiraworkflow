@@ -17,9 +17,11 @@ urlpatterns = [
     path('profile/custom/filter/enable', views.custom_filters_enable,  name='custom_filters_enable'),
     path('profile/custom/filter/list', views.custom_filters_list, name='custom_filters_list'),
     path('profile/custom/task', views.custom_user_tasks, name='custom_user_tasks'),
+    path('profile/meetings/calendar/setting', views.yandex_calendar, name='meetings_calendar_setting'),
     path('users', views.users, name='users'),
     path('users/form/<int:id>', views.userform, name='useredit'),
     path('users/delete', views.userdelete, name='userdelete'),
     path('users/synchronization/<int:id>', views.usersynchronization, name='usersynchronization'),
+    path('users/synchronization/custom', views.custom, name='custom')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     
