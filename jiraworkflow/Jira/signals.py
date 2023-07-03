@@ -20,4 +20,4 @@ def post_save_exercise(created, instance, **kwargs):
             shedule.save()
         except PeriodicTask.DoesNotExist as e:
             print(e)
-            PeriodicTask.objects.create(name=instance.name, task='jiraworkflow.calery.debug_task', crontab=cron)
+            PeriodicTask.objects.create(name=instance.name, task='Jira: Выгрузка задач', crontab=cron)

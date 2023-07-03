@@ -183,7 +183,7 @@
               </thead>
               <tbody>
                 {% for task in TaskResult %}
-                <div style="display: none;">STATUS {{task.status}}</div>
+                <div style="display: none;">NAME: {{task.task_name}}, STATUS: {{task.status}}</div>
                 {% get_status_sync task.task_id as status %}
                 <tr>
                   <td class="datetime-cell">{{ task.date_created }}</td>
@@ -219,28 +219,6 @@
                 </tr>
               </tbody>
             </table>
-            <div class="data-table-footer" style="position: absolute;width: 100%;bottom: 0;">
-              <div class="data-table-rows-select">
-                Per page:
-                <div class="input input-dropdown input-with-value">
-                  <select class="input-with-value">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="all">All</option>
-                  </select>
-                </div>
-              </div>
-              <div class="data-table-pagination">
-                <span class="data-table-pagination-label">1-5 of 10</span>
-                <a href="#" class="link disabled">
-                  <i class="icon icon-prev color-gray"></i>
-                </a>
-                <a href="#" class="link">
-                  <i class="icon icon-next color-gray"></i>
-                </a>
-              </div>
-            </div>
           </div>
         </div>
                         

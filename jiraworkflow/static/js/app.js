@@ -18,6 +18,7 @@ function saved(){
 
 function popup_info(el){
   console.log(el.find('.popup-sync-status'))
+
   el.on('popup:closed', '.popup-sync-status', function (e, popup) {
     app.popup.destroy('.popup')
   })
@@ -81,6 +82,176 @@ routes.push({
   url: './users/synchronization/custom', 
   on: {
     pageInit: function(event, page){
+      // Запуск синхронизации
+      page.$el.on('click', '.button-run-sync', function(){
+        let type_sync = page.$el.find('.buttons-sync .segmented .button-active').attr('name')
+        let nwl = new Object()
+        var tasks = JSON.parse($('.full-task-list').text())
+        let miting = page.$el.find('.toggle-miting input').is(':checked')
+        $('.data-table td.checkbox-cell input:checked').map((i, el) => {
+          let data = $(`#week_${el.id}, #project_${el.id}, #task_${el.id}, #date_${el.id}, #time_${el.id}`).
+              map((i, el) => {return el.textContent})
+              let week = data[0]
+              let project = data[1]
+              let task = data[2]
+              let date = data[3]
+              let time = data[4]
+              if (nwl.hasOwnProperty(week)){
+                if (nwl[week].hasOwnProperty(project)){
+                  if (nwl[week][project].hasOwnProperty(task)){
+                        if (nwl[week][project][task].hasOwnProperty('worklog')){
+                            nwl[week][project][task]['worklog'][date] = time
+                        }
+                  }else{
+                    let info = tasks[week][project][task]
+                        info['worklog'] = {[date]: time}
+                      nwl[week][project][task] = info
+                  }
+                }else{
+                  let info = tasks[week][project][task]
+                      info['worklog'] = {[date]: time}
+                  nwl[week][project] = {[task]: info}
+                }
+              }else{
+              let info = tasks[week][project][task]
+                  info['worklog'] = {[date]: time}
+              nwl[week] = {[project]: {[task]: info}}
+          }
+        })
+        app.request.setup({
+          headers: {
+            "X-CSRFToken": getCookie('csrftoken')
+          }
+          })
+        app.request.postJSON('users/synchronization/custom/sync', {task: nwl, metrhod: type_sync, miting: miting}, function(request){
+          console.log(request)
+          // 
+          app.notification.create({
+            title: 'Синхронизация',
+            titleRightText: 'Задание',
+            subtitle: 'Синхронизация запущена',
+            text: 'Результаты выполнения вожно увидить в списке задач, на странице пользователя.',
+            closeTimeout: 3000,
+          }).open()
+          //
+          navigate('/profile/')
+          //
+        }, function(request){
+          console.log(request)
+
+         let nw = app.notification.create({
+            title: 'Синхронизация',
+            titleRightText: `${request.status}: ${request.statusText}`,
+            subtitle: 'Ошибка при запуске задания',
+            closeButton: true,
+            on: {
+              open: function () {
+               let detail = this.$el.find('.notification-content')
+                   detail.append(
+                      $$(`<div style="padding-top: 5px;">
+                            <a href="#" style="color: darkblue;border-width: 0px 0px 1px 0px;border-style: double;" class="popup-open" data-popup=".popup-sync-error">Показать детали</a>
+                            <div class="popup popup-sync-status popup-sync-error">
+                              <div class="view">
+                                <div class="page">
+                                  <div class="page-content">
+                                    <input style="display: none;" type="text" name="task-status" value="FAILURE" />
+                                    <div style="height:100%;width:100%;display:inline-block;" required="" id="id_json" class=""></div>
+                                    <textarea id="id_json_textarea" name="json" required="" style="display: none" >
+                                    {
+                                      "request": {"code": "${request.status}", "status": "${request.statusText}"},
+                                      "response": ${request.response}
+                                    }
+                                    </textarea>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>`)
+                      )
+                    this.$el.on('click', '.popup-open', function(){
+                      nw.close()
+                    })
+              }
+            }
+          }).open()
+        }, 'json')
+        console.log(nwl, type_sync)
+      })
+
+      // выбор типа синхронизации
+      page.$el.on('click', '.buttons-sync .segmented button', function(){
+        page.$el.find('.buttons-sync .segmented button').removeClass('button-active')
+        $(this).addClass('button-active')
+      })
+
+      // Разблокировка синхронизации
+      $(document).on('click', '.data-table input[type="checkbox"]', function(){
+        if (! app.dataTable.get('.data-table')){
+          app.dataTable.create({el: '.data-table'})
+        }
+
+        let bs = page.$el.find('.buttons-sync')
+        let bl = page.$el.find('.button-load')
+        if (page.$el.find('.data-table input[type="checkbox"]:checked').length > 0){
+            if (bs.hasClass('simple')){
+              bs.removeClass('simple')
+            }
+            if (! bl.hasClass('simple')){
+              bl.addClass('simple')
+            }
+        }else{
+          if (! bs.hasClass('simple')){
+            bs.addClass('simple')
+          }
+          if (bl.hasClass('simple')){
+            bl.removeClass('simple')
+          }
+        }
+      })
+      function sync(filters, mitings, custom_dates=false, dates=undefined){
+        let errmesage = (message) => {
+          return `
+          <div style="background: url('/static/img/cloud_sync.webp') no-repeat;width: 400px;height: 400px;background-size: 100%;margin: auto;"></div>
+          <font class="start-info" style="width: 100%;text-align: center;display: block;">${message}</font>
+          <div class="process-load" style="display: none;">
+            <p style="margin: auto;text-align: center;" class="">Загружаю, подождите</p>
+            <p><span style="width: 100px;margin: auto;" id="inline-progressbar" class="progressbar-infinite color-multi"></span></p>
+          </div>
+          `
+        }
+        const datestring = (d) => {return d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate()}
+          page.$el.find('.process-load').css('display', '')
+          page.$el.find('.start-info').css('display', 'none')
+          if (custom_dates){
+            app.request.get(`./users/synchronization/custom/tasks?filters=${filters}&sdate=${datestring(dates[0])}&edate=${datestring(dates[1])}&mitings=${mitings}`, function(request){
+            page.$el.find('.block-task-list').html(request)
+            page.$el.on('click', '.project-not-fount', function(){
+              app.dialog.confirm('Отстутвует информация о проете. Перейти в профиль Timetta ?', function () {
+                navigate('/timetta/')
+            });
+          })
+            popup_info($(document))
+            }, function(request){
+              console.log(request)
+              //page.$el.find('.block-task-list').html(errmesage(request))
+            })
+          }else{
+            app.request.get(`./users/synchronization/custom/tasks?filters=${filters}&mitings=${mitings}`, function(request){
+              page.$el.find('.block-task-list').html(request)
+              page.$el.on('click', '.project-not-fount', function(){
+                app.dialog.confirm('Отстутвует информация о проете. Перейти в профиль Timetta ?', function () {
+                  navigate('/timetta/')
+              });
+            })
+            }, function(request){
+              console.log(request)
+              //page.$el.find('.block-task-list').html(errmesage(request))
+            })
+            popup_info($(document))
+          }
+         
+      }
+
       var monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
       var calendarInline = app.calendar.create({
           containerEl: '#demo-calendar-inline-container',
@@ -128,32 +299,55 @@ routes.push({
           }
       });
       app.calendarInline = calendarInline
+      
+      page.$el.on('smartselect:closed', '.smart-select', function(event, el){
+        let is_date_input = false
+        Array.from(app.smartSelect.get('.smart-select-filter').selectEl.selectedOptions).forEach(el => {
+          if (el.className == 'is-date-input'){
+              console.log(el.className);
+              is_date_input = true
+            }
+          })
+        let $calendar_el = page.$el.find('.card-calendar')
+        if (is_date_input){  
+          if ($calendar_el.hasClass("simple")){
+              $calendar_el.removeClass("simple")
+          }
+        }else{
+          if (! $calendar_el.hasClass("simple")){
+                $calendar_el.addClass("simple")
+          }
+        }
+      })
 
       page.$el.on('click', '.button-load', function(){
         let dates = app.calendarInline.getValue()
-        if (dates.length > 1){
-          let filters = app.smartSelect.get('.smart-select-filter')
-          if (filters.getValue().length > 0){
-              page.$el.find('.process-load').css('display', '')
-              page.$el.find('.start-info').css('display', 'none')
-          }else{
-            app.notification.create({
-              title: 'Синхронизация',
-              titleRightText: 'ошибка',
-              subtitle: 'Произошла ошибка',
-              text: 'Выбирете хотябы один фильтр',
-              closeTimeout: 3000,
-            }).open()
-          }
+        let filters = app.smartSelect.get('.smart-select-filter')
+        let mitings = page.$el.find('input[name="mitings"]').is(':checked')
+        if (filters.getValue().length > 0){
+            if (! page.$el.find('.card-calendar').hasClass('simple')){
+                if (dates.length > 1){
+                    sync(filters.getValue(), mitings, true, dates)
+                }else{
+                  app.notification.create({
+                    title: 'Синхронизация',
+                    titleRightText: 'ошибка',
+                    subtitle: 'Произошла ошибка',
+                    text: 'Выбирете диапазон дат в календаре',
+                    closeTimeout: 3000,
+                  }).open()
+                }                  
+            }else{
+              sync(filters.getValue(), mitings)
+            }
         }else{
           app.notification.create({
             title: 'Синхронизация',
             titleRightText: 'ошибка',
             subtitle: 'Произошла ошибка',
-            text: 'Выбирете диапазон дат в календаре',
+            text: 'Выбирете хотябы один фильтр',
             closeTimeout: 3000,
           }).open()
-    
         }
       })
     }
@@ -881,11 +1075,28 @@ const buttons = {
   }
 }
 
+const add_close_button = () => {
+  return {
+    opened: function () {
+      this.$el.on('click', '.close-menu', function(){
+        app.dialog.close()
+      })
+    },
+    open: function (){
+      console.log(this.$el.find('.dialog-inner'))
+      this.$el.find('.dialog-inner').append(
+        $$('<span style="position: absolute;right: 6px;top: 10px;opacity: 0.3;" class="material-icons icon hover-op link close-menu">highlight_off</span>')
+      )
+    }
+  }
+}
+
 let menu_jira = app.dialog.create({
   title: 'Меню',
   cssClass: 'dialog-nemu',
   buttons: [buttons.home, buttons.users, buttons.timetta, buttons.seporator, buttons.repassword, buttons.out],
   verticalButtons: true,
+  on: add_close_button()
 })
 
 let menu_home = app.dialog.create({
@@ -893,6 +1104,7 @@ let menu_home = app.dialog.create({
   cssClass: 'dialog-nemu',
   buttons: [ buttons.users, buttons.jira, buttons.timetta, buttons.seporator, buttons.repassword, buttons.out],
   verticalButtons: true,
+  on: add_close_button()
 })
 
 let menu_timetta = app.dialog.create({
@@ -900,6 +1112,7 @@ let menu_timetta = app.dialog.create({
   cssClass: 'dialog-nemu',
   buttons: [buttons.home, buttons.users, buttons.jira, buttons.seporator, buttons.repassword, buttons.out],
   verticalButtons: true,
+  on: add_close_button()
 })
 
 let menu_users = app.dialog.create({
@@ -907,6 +1120,7 @@ let menu_users = app.dialog.create({
   cssClass: 'dialog-nemu',
   buttons: [buttons.home, buttons.jira, buttons.timetta, buttons.seporator, buttons.repassword, buttons.out],
   verticalButtons: true,
+  on: add_close_button()
 })
 
 $$(document).on('click', '.menu-home', function () {

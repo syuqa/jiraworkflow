@@ -7,7 +7,7 @@
 		<div class="navbar-inner">
 		  <div class="left">
             <a class="link" href="/jira/">
-                <img src="{% static 'img/jira.png' %}"  />
+              <img src="/static/img/sync-logo.png" style="width: 60px;">
             </a>
           </div>
 		  <div class="title" style="text-align: center;">Синхронизация задач Jira</div>
@@ -29,7 +29,7 @@
                 <div class="card">
                   <form method="POST" enctype="multipart/form-data" class="form-ajax-submit-onchange" action="./users/synchronization/{{request.user.id}}">
                       {% csrf_token %}
-                      <div class="card-header">Синхронизация
+                      <div class="card-header">Автоматическая синхронизация
                         <label class="toggle toggle-init color-green">
                           {{ sync.synchronization }}
                           <span class="toggle-icon"></span>
@@ -115,7 +115,6 @@
                     </div>
                     <div class="card-footer">
                       <a href="#"></a>
-                      <a href="/custom-sync/">Выборочная синхронизация</a>
                     </div>
                   </div>
                 <!--div class="block block-strong no-padding" style="margin-top: 0px;margin-bottom: 0px;">
@@ -150,42 +149,23 @@
                   </div>
             </div>
             <div class="col">
-                <div class="card simple" style="opacity: 0;">
-                    <!--div class="card-header">Ручная синхронизация</div -->
-                    <div class="card-content card-content-padding">
-                      <div class="list">
-                        <ul>
-                          <li>
-                            <a href="#" class="item-link item-content">
-                              <div class="item-media"><i class="icon icon-f7"></i></div>
-                              <div class="item-inner">
-                                <div class="item-title">Выборочная синхронизация</div>
-                                <div class="item-after"></div>
-                              </div>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" class="item-link item-content">
-                              <div class="item-media"><i class="icon icon-f7"></i></div>
-                              <div class="item-inner">
-                                <div class="item-title">John Doe</div>
-                                <div class="item-after">Cleaner</div>
-                              </div>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" class="item-link item-content">
-                              <div class="item-media"><i class="icon icon-f7"></i></div>
-                              <div class="item-inner">
-                                <div class="item-title">Jenna Smith</div>
-                              </div>
-                            </a>
-                          </li>
-                        </ul>
+              <div data-pagination='{"el": ".swiper-pagination"}' data-space-between="10" data-slides-per-view="auto"
+                data-centered-slides="true" class="swiper swiper-init demo-swiper demo-swiper-auto" style="height: 260px;">
+                <div class="swiper-pagination"></div>
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide">
+                      <div class="card" style="height: 240px;margin-left: 0px;margin-right: 0px;">
+                        <div class="card-content card-content-padding">
+                          <div class="block-title" style="font-weight: bolder;">Выборочная синхронизация</div>
+                          <div class="block-header">Фунция для выполнения синхронизации в ручную, с возможносью выбора фильтров для сбора задач с Jira, и выбора задач которые будут отправлены в Timetta.</div>
+                          <a href="/custom-sync/" class="col button button-small button-outline" style="width: max-content;margin: auto;margin-top: 25px;z-index: 1;background: aliceblue;">Выборочная синхронизации</a>
+                          <img src="/static/img/5482719.png" style="position: absolute;top: 0;height: 100%;left: 25%;z-index: 0;opacity: 0.15;">
+                        </div>
                       </div>
                     </div>
-                    <!-- div class="card-footer">Card Footer</div-->
-                  </div>
+                  <div class="swiper-slide"><div class="card"></div></div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row-100" style="height: 52%;position: fixed;width: 100%;">
@@ -211,7 +191,7 @@
                         <tr>
                           <td class="datetime-cell">{{ task.date_created }}</td>
                           <td class="datetime-cell">{{ task.date_done }}</td>
-                          <td class="label-cell">{{ user.task_name }}</td>
+                          <td class="label-cell">{{ header.task_name }}</td>
                           <td class="label-cell">{{ header.task_kwargs|runuser }}</td>
                           <td class="label-cell">
                             <a href="#" id="{{task.task_id}}" class="badge item-link {{ status.status|statcolor }}" data-popup=".sync-{{task.task_id}}-popup">{{ status.status|rustatus }}</a>
@@ -244,28 +224,6 @@
                   </tr>
                 </tbody>
               </table>
-              <div class="data-table-footer" style="position: absolute;width: 100%;bottom: 0;">
-                <div class="data-table-rows-select">
-                  Per page:
-                  <div class="input input-dropdown input-with-value">
-                    <select class="input-with-value">
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="25">25</option>
-                      <option value="all">All</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="data-table-pagination">
-                  <span class="data-table-pagination-label">1-5 of 10</span>
-                  <a href="#" class="link disabled">
-                    <i class="icon icon-prev color-gray"></i>
-                  </a>
-                  <a href="#" class="link">
-                    <i class="icon icon-next color-gray"></i>
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
                         

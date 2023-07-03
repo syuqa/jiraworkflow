@@ -4,13 +4,38 @@ from datetime import datetime, timedelta
 from django import template
 from django_celery_results.models import TaskResult
 from timetta.utils import get_children, SyncStatusException, SyncTaskChildrenNone
+from timetta.models import TimettaProjects
 
 register = template.Library()
 
+@register.simple_tag
+def get_dict_data(data, key):
+    # print('get_dict_data', data, key, data.get(key))
+    return data.get(key)
+
+@register.filter(name='project_is_exist')
+def project_is_exist(project):
+    return TimettaProjects.objects.filter(jira_tag=project).exists()
+
+@register.filter(name='get_item_index')
+def get_item_index(data, key):
+    keys = [*data.keys()]
+    return keys.index(key)
 
 @register.filter(name='items')
-def items(data):
-    return data.items()
+def items(data, attr=None):
+    if attr:
+        values = data.get(attr)
+        if values and isinstance(values, dict):
+            return values.items()
+        else:
+            return ()
+    else:
+        return data.items()
+
+@register.filter(name='tojson')
+def to_json(data):
+    return json.dumps(data)
 
 @register.filter(name='ident')
 def ident(data):
@@ -70,13 +95,17 @@ def errormessage(result):
 
 @register.filter(name='runuser')
 def runuser(kwargs):
+    print('---- get run name -----')
+    print(kwargs.replace('...', '').replace("False", "false").replace("True", "true"))
     try:
-        u = json.loads(json.loads(kwargs).replace("'", '"'))
+        u = json.loads(json.loads(kwargs.replace('...', '').replace("False", "false").replace("True", "true")).replace("'", '"'))
+        print(u)
         if u.get('username'):
             return u.get('username')
         else:
             return 'не определен'
-    except Exception:
+    except Exception as e:
+        print(e)
         return 'не определен'
 
 @register.filter(name='get')
@@ -100,6 +129,7 @@ def get_task_synweek(usertask_id, week):
 
 @register.filter(name='weekinfo')
 def weekinfo(date, info):
+    print('WEEK DATE', date)
     today = datetime.strptime(date, '%Y-%m-%d')
     week = today.isocalendar()[1]
     end = today + timedelta(6 - datetime.weekday(today))
@@ -124,13 +154,19 @@ def check_status(id, status, msg=None, trace=None):
     if not status == 'SUCCESS':
         raise SyncStatusException(status, msg, trace)
 
-def check_status_child(parent, task_kwargs=None):
+def check_status_child(parent, task_kwargs=None, taskname=None):
     tasks = []
     result = None
     if task_kwargs:
-        children = TaskResult.objects.filter(task_id__in=parent, task_kwargs__contains=task_kwargs)
+        if taskname:
+            children = TaskResult.objects.filter(task_id__in=parent, task_kwargs__contains=task_kwargs, task_name=taskname)
+        else:
+            children = TaskResult.objects.filter(task_id__in=parent, task_kwargs__contains=task_kwargs)
     else:
-        children = TaskResult.objects.filter(task_id__in=parent)
+        if taskname:
+            children = TaskResult.objects.filter(task_id__in=parent, task_name=taskname)
+        else:
+            children = TaskResult.objects.filter(task_id__in=parent)
     print('--- children: ', children)
     if len(children) > 0:
         for child in children:
@@ -167,16 +203,17 @@ def get_meetings_task(task, user):
         return []
 
 @register.simple_tag
-def get_status_sync(task, user='', week='', project=''):
+def get_status_sync(task, user='', week='', project='', stask=False):
+    t = 'Timetta: Синхронизация по неделям' if stask else None
     try:
         print('TASK <', task, '> USER <', user, '> WEEK <', week, '> PROJECT <', project, '>')
         users, uresult = check_status_child([task])
         print('USER: ', users, 'RESULT:', uresult)
-        weeks, wresult = check_status_child(users)
+        weeks, wresult = check_status_child(parent=users)
         print('WEEK: ', weeks, 'RESULT', wresult)
-        proj, presult = check_status_child(weeks, user)
+        proj, presult = check_status_child(parent=weeks, task_kwargs=user, taskname=t)
         print('PROJ: ', proj, 'RESULT', presult)
-        sync, sresult = check_status_child(proj, week)
+        sync, sresult = check_status_child(parent=proj, task_kwargs=week)
         print('SYNC: ', proj, 'RESULT', sresult)
         _as, result = check_status_child(sync, project)
         print('ASYNC:', _as, 'RESULT', result)
@@ -198,7 +235,7 @@ def get_status_sync(task, user='', week='', project=''):
         return info
     except SyncTaskChildrenNone as e:
         info =  {
-            "status": '',
+            "status": 'Выполняется',
             "result": {},
             "trace": f'Task {e.args[0]} not children.'
             } 

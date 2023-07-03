@@ -22,6 +22,8 @@ urlpatterns = [
     path('users/form/<int:id>', views.userform, name='useredit'),
     path('users/delete', views.userdelete, name='userdelete'),
     path('users/synchronization/<int:id>', views.usersynchronization, name='usersynchronization'),
-    path('users/synchronization/custom', views.custom, name='custom')
+    path('users/synchronization/custom', views.custom, name='custom'),
+    path('users/synchronization/custom/tasks', views.custom_tasks, name='custom_tasks'),
+    path('users/synchronization/custom/sync', views.custom_sync, name='custom_sunc')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     

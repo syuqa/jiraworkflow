@@ -13,6 +13,7 @@ from accounts.models import CustomUser
 from Jira.models import JiraExercise
 from Jira.forms import JiraExerciseForm
 from Jira.processor import JiraTasks
+from timetta.tasks import custom_sync as task_custom_sync
 from .forms import *
 
 logger = logging.getLogger(__name__)
@@ -78,7 +79,7 @@ def profile(request):
             }
         },
         'meetings': YandexCalendarForm(instance=request.user),
-        'TaskResult': TaskResult.objects.filter(task_name='Jira: Выгрузка задач')
+        'TaskResult': TaskResult.objects.filter(task_name__in=('Jira: Выгрузка задач', 'Выборочная синхронизация'))[:5]
     }
     return render(request, 'jirausers/profile.html', context)
 
@@ -202,13 +203,36 @@ def usersynchronization(request, id):
 def custom(request):
     if request.method == 'GET':
         context = {
-            "filters": GlobalSyncFiters()
+            "filters": JiraFilters.objects.all() #GlobalSyncFiters()
         }
         return render(request, 'jirausers/custom-sync.html', context)
+    
+@login_required
+def custom_tasks(request):
+    if request.method == 'GET':
+        filters = request.GET.get('filters')
+        sdate = request.GET.get('sdate')
+        edate = request.GET.get('edate')
+        mitings = request.GET.get('mitings')
+        # print(filters, sdate, edate, mitings)
+        jira = JiraTasks()
+        tasks= jira.get_tasks([request.user], sdate=sdate, edate=edate, filters=filters.split(','))
+        # print('TASKS', tasks)
+        context = {
+            "tasks": tasks if tasks == {} else tasks[request.user.email]
+        }
+        # print('TYPE', type(context.get('tasks')), 'TASKS', context.get('tasks'))
+        return render(request, 'jirausers/custom-sunc-list.html', context)
 
 @login_required
-def custom_sunc_list(request, sdate, edate):
-    if request.method == 'GET':
-        context = {
-        }
-        return render(request, 'jirausers/custom-sunc-list.html', context)
+def custom_sync(request):
+    if request.method == 'POST':
+        try:
+            tasklist = json.loads(request.body.decode())
+            task_custom_sync.apply_async(
+                kwargs={"issues": {request.user.email: tasklist.get('task')}, "username" : request.user.username, "mitings": tasklist.get('miting')})
+            return JsonResponse({"msg": "Задание запущено"}, status=200,content_type="application/json")
+        except Exception as e:
+            print(e)
+            return JsonResponse({"msg": str(e)}, status=500,content_type="application/json")
+        

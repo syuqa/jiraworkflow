@@ -21,53 +21,59 @@
       <div class="block grid-resizable-demo" style="height: 100%;margin-bottom: 0px;margin-top: 0px;padding-top: 15px;">
         <div class="row" style="height: inherit;">
           <div class="col-20 resizable resizable-fixed" style="height: inherit;">
-            <div class="card" style="margin: 0px;">
-              <div class="card-content">
-                <div class="block block-strong no-padding" style="margin-bottom: 0px;"><div id="demo-calendar-inline-container"></div></div>
-              </div>
-            </div>
-            <div class="card" style="margin-left: 0px;margin-right: 0px;">
+            <div class="card" style="margin-left: 0px;margin-right: 0px;margin-top: 0px;">
               <div class="card-content">
                 <div class="list" style="margin-top: 0px;">
                   <ul>
+                      <li>
+                          <a class="item-link smart-select smart-select-init smart-select-filter"  data-open-in="popup">
+                            <select name="filter" required="" id="id_filter" multiple="" class="">
+                              {% for filter in filters %}
+                              <option value="{{filter.id}}" class="{% if 'sdate' in filter.jsql and 'edate' in filter.jsql %}is-date-input{% endif %}">{{filter.name}}</option>
+                              {% endfor %}
+                            </select>
+                              <div class="item-inner" style="padding-left: 15px;">
+                                <div class="item-title">Фильры</div>
+                              </div>
+                          </a>
+                      </li>
                       <li>
                         <div class="item-content">
                         <div class="item-inner">
                             <div class="item-title">Яндекс календарь</div>
                             <div class="item-after">
-                                <label class="toggle toggle-init">
+                                <label class="toggle toggle-init toggle-mitings">
                                   <input name="mitings" type="checkbox" />
                                     <span class="toggle-icon"></span>
                                   </label>
                             </div>
                         </div>
                         </div>
-                    </li>
-                      <li>
-                          <a class="item-link smart-select smart-select-init smart-select-filter"  data-open-in="popup">
-                              {{ filters.filter }}
-                              <div class="item-inner" style="padding-left: 15px;">
-                                <div class="item-title">Фильры</div>
-                              </div>
-                          </a>
                       </li>
                   </ul>
               </div>
-              <button class="col button button-raised button-fill button-load" style="border-radius: 0;">Загрузить список</button>
               </div>
             </div>
-            <div class="block block-strong no-padding simple">
-              <p class="segmented segmented-raised" style="margin-bottom: 0px;border-radius: 0;">
-                <button class="button" style="border-radius: 0;">замена</button>
-                <button class="button" style="border-radius: 0;">мердж</button>
-                <button class="button button-active" style="border-radius: 0;">отдельно</button>
-              </p>
-              <button class="col button button-raised button-fill color-green" style="border-radius: 0px 0px 4px 4px;">Синхронизация</button>
+            <div class="card card-calendar simple" style="margin: 0px;">
+              <div class="card-content">
+                <div class="block block-strong no-padding" style="margin-bottom: 0px;"><div id="demo-calendar-inline-container"></div></div>
+              </div>
+            </div>
+            <div class="block block-strong no-padding" style="margin-top: 30px;margin-bottom: 0px;">
+              <button class="col button button-raised button-fill button-load" style="border-radius: 0;">Загрузить список</button>
+              <div class="buttons-sync simple">
+                <p class="segmented segmented-raised" style="margin-bottom: 0px;border-radius: 0;">
+                  <button class="button" name="Replace" style="border-radius: 0;">замена</button>
+                  <button class="button" name="Merge" style="border-radius: 0;">мердж</button>
+                  <button class="button button-active" name="CreateNew" style="border-radius: 0;">отдельно</button>
+                </p>
+                <button class="col button button-raised button-fill color-green button-run-sync" style="border-radius: 0px 0px 4px 4px;">Синхронизация</button>
+              </div>
             </div>
         </div>
-        <div class="col-80 resizable">
+        <div class="col-80 resizable block-task-list">
           <div style="background: url('{% static 'img/cloud_sync.webp' %}') no-repeat;width: 400px;height: 400px;background-size: 100%;margin: auto;"></div>
-            <font class="start-info" style="width: 100%;text-align: center;display: block;">Для загрузки списка задач, выбирите диапазон дат в календарь и фильры, затем нажмите "Загрузить список"</font>
+            <font class="start-info" style="width: 100%;text-align: center;display: block;">Для загрузки списка задач, выбирите фильры и в зависимости от выбранных фильров, может потребоватся выбор диапазона дат, затем нажмите "Загрузить список"</font>
             <div class="process-load" style="display: none;">
               <p style="margin: auto;text-align: center;" class="">Загружаю, подождите</p>
               <p><span style="width: 100px;margin: auto;" id="inline-progressbar" class="progressbar-infinite color-multi"></span></p>

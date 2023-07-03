@@ -7,10 +7,10 @@ all: build test
 build:
 	docker-compose build
 
-run:
+up:
 	docker-compose up -d
 
-stop:
+down:
 	docker-compose down
 
 restart:

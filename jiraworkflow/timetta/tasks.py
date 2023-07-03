@@ -8,9 +8,17 @@ from accounts.models import CustomUser
 def test_task(self):
     print(f'Request: {self.request}')
 
+
+@shared_task(bind=True, name="Выборочная синхронизация")
+def custom_sync(self, issues, username, mitings):
+    timetta_sync_users.apply_async(
+        kwargs={"issues": issues, "custom": True, "sync": mitings}
+    )
+    return issues
+
 @shared_task(bind=True, name="Timetta: Синхронизация по пользователям")
 # 'Timetta: Синхронизация по пользователям'
-def timetta_sync_users(self, issues):
+def timetta_sync_users(self, issues, custom=False, sync=False):
     for useremail, weeks in issues.items():
         print(f'{useremail}: CREATE TASK SYNC USER')
         # Task
@@ -18,7 +26,7 @@ def timetta_sync_users(self, issues):
             kwargs={"useremail": useremail, "weeks": weeks})
         # Mitings
         meetings_sync.apply_async(
-                kwargs={"user": useremail}
+                kwargs={"user": useremail, "custom": custom, "sync": sync}
             )
 
 
@@ -52,11 +60,13 @@ def timetta_sync(self, useremail, week, project, issues, ):
 
 
 @shared_task(bind=True, name="Timetta: Синхронизация митингов")
-def meetings_sync(self, user):
-    print(f'{user}: CREATE SYNC MEETINGS')
+def meetings_sync(self, user, custom=False, sync=None):
+    print(f'{user}: CREATE SYNC MEETINGS', 'self', self)
     u = CustomUser.objects.get(email=user)
-    if u.synchronization_meetings:
-        meeting = YandexCalendarTasks(u)
-        return meeting.sync()
+    _sync = sync if sync is not None else u.synchronization_meetings
+    print('METUNGS IF', custom, _sync, )
+    if custom and _sync or not custom and _sync:
+         meeting = YandexCalendarTasks(u)
+         return meeting.sync()
     else:
         return {"status": "Synchronization meetings disable"}

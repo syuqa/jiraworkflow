@@ -83,8 +83,9 @@ class JiraTasks:
         time_spents = {}
         for log in worklog:
             print('log:', log)
+            #print('logAttr:', log.__dict__)
             print('autor:', log.author.name, ', user:', user.username)
-            created =  datetime.strptime(log.created, '%Y-%m-%dT%H:%M:%S.%f%z')
+            created =  datetime.strptime(log.started, '%Y-%m-%dT%H:%M:%S.%f%z')
             if log.author.name == user.username and datetime.now().year == created.year:
                 date = created.strftime('%Y-%m-%d')
                 print('date:', date, 'timeSpent', log.timeSpent)
@@ -101,7 +102,7 @@ class JiraTasks:
         tasks = {}
         logger.info({"JiraSunc": {"users": [user.username for user in users]}})
         for user in users:
-            filters = self.get_filters(user) if filters else JiraFilters.objects.filter(id__in=filters)
+            filters = JiraFilters.objects.filter(id__in=filters) if filters else self.get_filters(user)
             logger.info({"JiraSunc": {"Get jira filters": {"user": user.username, "filters": [f.jsql for f in filters]}}})
             for filter in filters:
                 # print('Filter', filter)

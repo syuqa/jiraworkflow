@@ -50,9 +50,10 @@ def jira(request):
             'jiraexercise_exist': jiraexercise_exixt,
             'jiraexercise': jiraexercise,
             'jirafilter': JiraFilters.objects.all(),
-            'TaskResult': TaskResult.objects.filter(task_name='Jira: Выгрузка задач')
+            'TaskResult': TaskResult.objects.filter(task_name__in=('Jira: Выгрузка задач', 'Выборочная синхронизация'))[:5]
             
         }
+        print(constext)
     return render(request, 'jira/index.html', constext)
 
 @login_required

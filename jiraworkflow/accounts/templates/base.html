@@ -23,11 +23,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  <link rel="icon" href="icons/favicon.png">
+  <link rel="icon" href="{% static 'img/sync-logo.png' %}">
   <link rel="stylesheet" href="{% static 'framework7/framework7-bundle.min.css' %}">
   <link rel="stylesheet" href="{% static 'framework7/framework7-icons.css' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" href="{% static 'css/jquery.mCustomScrollbar.css' %}">
+  <link rel="preload" as="image" href="{% static 'img/cloud_sync.webp' %}" />
+  <link rel="preload" as="image" href="{% static 'img/workspace.webp' %}" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
   {% block css %}{% endblock css %}
 

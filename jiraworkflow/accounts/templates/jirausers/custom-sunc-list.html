@@ -1,12 +1,14 @@
+{% load custom_tags %}
+
 <div class="col-80 resizable">
   <div class="data-table data-table-init card" style="margin: 0;">
     <div class="card-content">
-      <table>
+      <table style="overflow: hidden;">
         <thead>
           <tr>
             <th class="checkbox-cell" style="height: 47px;background-color: #f7f7f8;">
               <label class="checkbox">
-                <input type="checkbox" />
+                <input type="checkbox" class="all-select" />
                 <i class="icon-checkbox"></i>
               </label>
             </th>
@@ -15,24 +17,79 @@
             <th class="label-cell" style="height: 47px;background-color: #f7f7f8;">Задача</th>
             <th class="label-cell" style="height: 47px;background-color: #f7f7f8;">Дата</th>
             <th class="label-cell" style="height: 47px;background-color: #f7f7f8;">Время</th>
+            <th class="actions-cell" style="height: 47px;background-color: #f7f7f8;"></th>
+            <th class="actions-cell" style="height: 47px;background-color: #f7f7f8;"></th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="checkbox-cell">
-              <label class="checkbox">
-                <input type="checkbox" />
-                <i class="icon-checkbox"></i>
-              </label>
-            </td>
-            <td class="label-cell">1 неделя 2023</td>
-            <td class="label-cell">GLMRT</td>
-            <td class="label-cell">GLMRT-1024</td>
-            <td class="label-cell">22.06.2023</td>
-            <td class="label-cell">1h</td>
-          </tr>
+          {% for week, projects in tasks|items %}
+            <div class="full-task-list" style="display: none;">{{tasks|tojson}}</div>
+            {% for project, tasks in projects|items %}
+              {% for task, taskinfo in tasks|items %}
+                {% get_dict_data taskinfo 'worklog' as worklog %}
+                {% for date, time in worklog|items %}
+                {% strhash week task date as popupid %}
+                  <tr>
+                    <td class="checkbox-cell">
+                      <label class="checkbox">
+                        <input type="checkbox" id="{{popupid}}" name="item-select"/>
+                        <i class="icon-checkbox"></i>
+                      </label>
+                    </td>
+                    <td class="label-cell" {% if worklog|get_item_index:date > 0 %}style="color: #a9a9a996;"{% endif %} >{{week|weekinfo:'week'}}</td>
+                    <td id="week_{{popupid}}" style="display: none;" class="label-cell">{{week}}</td>
+                    <td id="project_{{popupid}}" class="label-cell" {% if worklog|get_item_index:date > 0 %}style="color: #a9a9a996;"{% endif %}>{{project}}</td>
+                    <td id="task_{{popupid}}" class="label-cell" {% if worklog|get_item_index:date > 0 %}style="color: #a9a9a996;"{% endif %}>{{task}}</td>
+                    <td id="date_{{popupid}}" class="label-cell">{{date}}</td>
+                    <td id="time_{{popupid}}" class="label-cell">{{time}}</td>
+                    <td class="actions-cell">
+                      {% if project|project_is_exist %}<a href="#" class="material-icons icon project-not-fount"  style="padding-right: 13px;color: orangered;padding-top: 5px;">warning_amber</a>{%endif%}
+                    </td>
+                    <td class="actions-cell">
+                      {% if worklog|get_item_index:date == 0 %}
+                      <a href="#" id="a_{{popupid}}" class="item-link icon material-icons link hover-op popup-open" style="opacity: 0.4;" data-popup=".taskinfo-{{popupid}}-popup">info_outline</a>
+                      <div class="popup popup-sync-status taskinfo-{{popupid}}-popup">
+                        <div class="view">
+                          <div class="page">
+                            <div class="page-content">
+                              <input style="display: none;" type="text" name="task-status" value="SUCCESS" />
+                              <div style="height:100%;width:100%;display:inline-block;" required="" id="id_json" class=""></div>
+                              <textarea id="id_json_textarea" name="json" required="" style="display: none" >{{taskinfo|tojson}}</textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {%endif%}
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% endfor %}
+            {% endfor %}
+          {% endfor %}
         </tbody>
       </table>
+      <div class="data-table-footer" style="display: none;">
+        <div class="data-table-rows-select">
+          Per page:
+          <div class="input input-dropdown">
+            <select>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+        </div>
+        <div class="data-table-pagination" >
+          <span class="data-table-pagination-label">1-5 of 10</span>
+          <a href="#" class="link disabled">
+            <i class="icon icon-prev color-gray"></i>
+          </a>
+          <a href="#" class="link">
+            <i class="icon icon-next color-gray"></i>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
   <span class="resize-handler"></span>
