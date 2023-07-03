@@ -43,7 +43,7 @@
                     <td id="date_{{popupid}}" class="label-cell">{{date}}</td>
                     <td id="time_{{popupid}}" class="label-cell">{{time}}</td>
                     <td class="actions-cell">
-                      {% if project|project_is_exist %}<a href="#" class="material-icons icon project-not-fount"  style="padding-right: 13px;color: orangered;padding-top: 5px;">warning_amber</a>{%endif%}
+                      {% if not project|project_is_exist %}<a href="#" class="material-icons icon project-not-fount"  style="padding-right: 13px;color: orangered;padding-top: 5px;">warning_amber</a>{%endif%}
                     </td>
                     <td class="actions-cell">
                       {% if worklog|get_item_index:date == 0 %}

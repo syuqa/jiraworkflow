@@ -230,7 +230,7 @@ def custom_sync(request):
         try:
             tasklist = json.loads(request.body.decode())
             task_custom_sync.apply_async(
-                kwargs={"issues": {request.user.email: tasklist.get('task')}, "username" : request.user.username, "mitings": tasklist.get('miting')})
+                kwargs={"issues": {request.user.email: tasklist.get('task')}, "username" : request.user.username, "mitings": tasklist.get('miting'), "method": tasklist.get('metrhod')})
             return JsonResponse({"msg": "Задание запущено"}, status=200,content_type="application/json")
         except Exception as e:
             print(e)
