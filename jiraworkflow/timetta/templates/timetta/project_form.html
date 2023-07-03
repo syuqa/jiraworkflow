@@ -78,11 +78,13 @@
     </div>
     <div class="row" style="border-style: dashed;border-width: 2px;border-color: #8080805c;">
         <div class="col" style="padding-left: 10px;">
-            <div class="block-title" style="margin-top: 15px;">Проект</div>
+            <div class="block-title" style="margin-top: 15px;">Проект
+                <span style="float: right" enable="false" class="badge link hover-op project-resurse">Ресурный план</span>
+            </div>
             <div class="list links-list">
                 <ul id="project_list" style="height: 230px;overflow: auto">
                     {% for project in project_list %}
-                        <li><a href="#" class="get-task-list" project="{{project.id}}">{{project.project.name}}</a></li>
+                        <li><a href="#" class="get-task-list" {% if project.id in project_resurses %}my_resurse="true"{%else%}my_resurse="false"{%endif%} project="{{project.id}}">{{project.project.name}}</a></li>
                     {% endfor %}
                 </ul>
             </div>

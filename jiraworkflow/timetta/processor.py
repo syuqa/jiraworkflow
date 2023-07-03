@@ -72,10 +72,29 @@ class TimettaHTTPRequests:
         logger.info({"JiraSunc": {"Timetta post time": {"time entries": timeEntries, 'url': url}}})
         return requests.post(url=url, headers={**headers, **self.main_headers}, data=json.dumps(timeEntries))
     
+    @auth("wp")
+    def get_resource_project(self, user, _from, _to, headers=None):
+        uu = self.get_user(user)
+        if len(uu.get('value')) > 0:
+            print(uu.get('value'))
+            uid = [u.get('id') for u in uu.get('value')]
+            url = "https://api.timetta.com/odata/BookingEntries/GetBookings?$select=projectId"
+            return requests.post(url=url, headers={**headers, **self.main_headers}, data=json.dumps({"from": _from, "to": _to, "resourceIds": uid}))
+        raise Exception("User not exist")
+
+    @auth("wp")
+    def get_resource_plan(self, user, _from, _to, scale="Week", headers=None):
+        url = 'https://api.timetta.com/odata/BookingEntries/GetBookings?$select=id,rowVersion,requiredHours,bookedHours,resourceId,type,from,to,planningMethod,editAllowed,isTimeOff&$expand=detailEntries($select=date,hours;$orderby=date),project($select=id,name),resourceRequest($select=id,name)'
+        return requests.post(url=url, headers={**headers, **self.main_headers}, data=json.dumps({"from": _from, "to": _to, "scale": scale, "resourceIds": [user]}))
 
 class TimettaSync(TimettaHTTPRequests):
     def __init__(self):
         super().__init__()
+
+    def resource_plan(self, user, _from, _to):
+        uid = self.get_user_id(user.email)
+        plan = self.get_resource_plan(user=uid, _from=_from, _to=_to)
+        return plan.get('value')
 
     def get_user_id(self, user):
         print('---------/ GET USER ID /----------')

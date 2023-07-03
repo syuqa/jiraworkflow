@@ -448,6 +448,17 @@ routes.push({
         cssClass: 'dialog-project',
         on: {
           opened: function (dialog) {
+            dialog.$el.on('click', '.project-resurse', function(){
+              console.log(this)
+              let sort = $$(this)
+              if (sort.attr('enable') == "false"){
+                dialog.$el.find('.get-task-list[my_resurse="false"]').css('display', 'none')
+                sort.attr('enable', 'true')
+              }else{
+                dialog.$el.find('.get-task-list[my_resurse="false"]').css('display', '')
+                sort.attr('enable', 'false')
+              }
+            })
 
             app.tooltip.create({
               targetEl: '.tooltip-mitting-summary',

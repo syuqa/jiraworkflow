@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -8,7 +9,7 @@ from .models import TimettaConnect, TimettaProjects
 from .processor import TimettaHTTPRequests
 
 logger = logging.getLogger(__name__)
-
+now = datetime.datetime.now()
 # Create your views here.
 
 def timetta(request):
@@ -68,12 +69,21 @@ def projects(request, id):
         try:
             wp = TimettaHTTPRequests()
             project_list = wp.projects()
-        except:
+            try:
+                project_resurses = wp.get_resource_project(request.user.email, f'{now.year}-01-01', f'{now.year}-12-01')
+                print(project_resurses)
+            except Exception as e:
+                print(e)
+                project_resurses = {'value': []}
+        except Exception as e:
+            print(e)
+            project_resurses = {'value': []}
             project_list = {'value': []}
 
         context = {
             'form': form,
             'id': id,
+            'project_resurses': [p.get('projectId') for p in project_resurses.get('value')],
             'project_list': project_list.get('value'),
             'totip_meeting_summary': """
             <h3>Заголовок события в Я.Календаре</h3>
