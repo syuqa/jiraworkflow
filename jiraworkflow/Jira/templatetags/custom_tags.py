@@ -96,9 +96,9 @@ def errormessage(result):
 @register.filter(name='runuser')
 def runuser(kwargs):
     print('---- get run name -----')
-    print(kwargs.replace('...', '').replace("False", "false").replace("True", "true"))
+    print(kwargs.replace('...', '').replace("False", "false").replace("True", "true").replace("[", "'").replace("]", "'"))
     try:
-        u = json.loads(json.loads(kwargs.replace('...', '').replace("False", "false").replace("True", "true")).replace("'", '"'))
+        u = json.loads(json.loads(kwargs.replace('...', '').replace("False", "false").replace("True", "true").replace("[", "'").replace("]", "'")).replace("'", '"'))
         print(u)
         if u.get('username'):
             return u.get('username')

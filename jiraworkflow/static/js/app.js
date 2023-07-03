@@ -87,7 +87,7 @@ routes.push({
         let type_sync = page.$el.find('.buttons-sync .segmented .button-active').attr('name')
         let nwl = new Object()
         var tasks = JSON.parse($('.full-task-list').text())
-        let miting = page.$el.find('.toggle-miting input').is(':checked')
+        let miting = page.$el.find('input[name="mitings"]').is(':checked')
         $('.data-table td.checkbox-cell input:checked').map((i, el) => {
           let data = $(`#week_${el.id}, #project_${el.id}, #task_${el.id}, #date_${el.id}, #time_${el.id}`).
               map((i, el) => {return el.textContent})
@@ -123,7 +123,7 @@ routes.push({
             "X-CSRFToken": getCookie('csrftoken')
           }
           })
-        app.request.postJSON('users/synchronization/custom/sync', {task: nwl, metrhod: type_sync, miting: miting}, function(request){
+        app.request.postJSON('users/synchronization/custom/sync', {task: nwl, metrhod: type_sync, miting: miting, dates:app.calendarInline.getValue()}, function(request){
           console.log(request)
           // 
           app.notification.create({

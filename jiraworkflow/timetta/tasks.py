@@ -10,15 +10,15 @@ def test_task(self):
 
 
 @shared_task(bind=True, name="Выборочная синхронизация")
-def custom_sync(self, issues, username, mitings, method):
+def custom_sync(self, issues, username, mitings, method, dates):
     timetta_sync_users.apply_async(
-        kwargs={"issues": issues, "custom": True, "sync": mitings, "method": method}
+        kwargs={"issues": issues, "custom": True, "sync": mitings, "method": method, "dates": dates}
     )
     return issues
 
 @shared_task(bind=True, name="Timetta: Синхронизация по пользователям")
 # 'Timetta: Синхронизация по пользователям'
-def timetta_sync_users(self, issues, custom=False, sync=False, method="replace"):
+def timetta_sync_users(self, issues, custom=False, sync=False, method="replace", dates=[None, None]):
     for useremail, weeks in issues.items():
         print(f'{useremail}: CREATE TASK SYNC USER')
         # Task
@@ -26,7 +26,7 @@ def timetta_sync_users(self, issues, custom=False, sync=False, method="replace")
             kwargs={"useremail": useremail, "weeks": weeks, "method":method})
         # Mitings
         meetings_sync.apply_async(
-                kwargs={"user": useremail, "custom": custom, "sync": sync}
+                kwargs={"user": useremail, "custom": custom, "sync": sync, "dates": dates}
             )
 
 
@@ -60,13 +60,12 @@ def timetta_sync(self, useremail, week, project, issues, method):
 
 
 @shared_task(bind=True, name="Timetta: Синхронизация митингов")
-def meetings_sync(self, user, custom=False, sync=None):
-    print(f'{user}: CREATE SYNC MEETINGS', 'self', self)
+def meetings_sync(self, user, custom=False, sync=None, dates=None):
     u = CustomUser.objects.get(email=user)
     _sync = sync if sync is not None else u.synchronization_meetings
-    print('METUNGS IF', custom, _sync, )
+    print(f'{user}: CREATE SYNC MEETINGS', custom, sync, dates)
     if custom and _sync or not custom and _sync:
          meeting = YandexCalendarTasks(u)
-         return meeting.sync()
+         return meeting.sync(sdate=dates[0], edate=dates[1])
     else:
         return {"status": "Synchronization meetings disable"}

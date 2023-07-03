@@ -1,5 +1,6 @@
 import logging
 import json
+from datetime import datetime
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
@@ -229,8 +230,11 @@ def custom_sync(request):
     if request.method == 'POST':
         try:
             tasklist = json.loads(request.body.decode())
+            sdate = datetime.strptime(tasklist.get('dates')[0], '%Y-%m-%dT%H:%M:%S.%f%z')
+            edate = datetime.strptime(tasklist.get('dates')[1], '%Y-%m-%dT%H:%M:%S.%f%z')
+            print('SYNCDATES', sdate, edate)
             task_custom_sync.apply_async(
-                kwargs={"issues": {request.user.email: tasklist.get('task')}, "username" : request.user.username, "mitings": tasklist.get('miting'), "method": tasklist.get('metrhod')})
+                kwargs={"issues": {request.user.email: tasklist.get('task')}, "username" : request.user.username, "mitings": tasklist.get('miting'), "method": tasklist.get('metrhod'), "dates": [sdate, edate]})
             return JsonResponse({"msg": "Задание запущено"}, status=200,content_type="application/json")
         except Exception as e:
             print(e)
