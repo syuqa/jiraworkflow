@@ -28,4 +28,3 @@ def post_save_exercise(created, instance, **kwargs):
         except PeriodicTask.DoesNotExist as e:
             print(e)
             PeriodicTask.objects.create(name=f'jira_user{instance.id}_sync_once_a_week', task='Jira: Выгрузка задач', crontab=cron)
-        

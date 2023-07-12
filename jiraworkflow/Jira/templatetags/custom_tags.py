@@ -239,5 +239,5 @@ def get_status_sync(task, user='', week='', project='', stask=False):
             "result": {},
             "trace": f'Task {e.args[0]} not children.'
             } 
-        return ''
+        return info
     

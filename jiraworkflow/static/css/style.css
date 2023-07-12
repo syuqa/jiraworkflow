@@ -260,3 +260,84 @@
   background: #008000db !important;
   opacity: 1 !important;
 }
+
+.dialog-profile {
+  height: 80%;
+  width: 60%;
+  left: 28%;
+}
+
+.dialog-profile .dialog-inner {
+  height: 94%;
+}
+
+.md .input:not(.input-outline):after,
+.md .item-input:not(.item-input-outline) .item-input-wrap:after {
+  height:0.5px !important;
+}
+
+.dialog-profile input[type="text"] {
+  color: darkslategray;
+}
+
+.input-passhow-button {
+	opacity: 0;
+	pointer-events: none;
+	visibility: hidden;
+	transition-duration: .1s;
+	position: absolute;
+	top: 50%;
+	border: none;
+	padding: 0;
+	margin: 0;
+	outline: 0;
+	z-index: 1;
+	cursor: pointer;
+	background: 0 0;
+	width: var(--f7-input-clear-button-size);
+	height: var(--f7-input-clear-button-size);
+	margin-top: calc(-1 * var(--f7-input-clear-button-size)/ 2);
+	color: var(--f7-input-clear-button-color);
+	right: 0;
+}
+
+.input-passhow-button::after {
+	font-family: 'Material Icons';
+	font-weight: 400;
+	font-style: normal;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	white-space: nowrap;
+	word-wrap: normal;
+	direction: ltr;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+	-moz-osx-font-smoothing: grayscale;
+	font-feature-settings: 'liga';
+	text-align: center;
+	display: block;
+	width: 100%;
+	height: 100%;
+	font-size: 20px;
+}
+
+.md .input-passhow-button::before {
+	width: 48px;
+	height: 48px;
+	margin-left: -24px;
+	margin-top: -24px;
+}
+
+.input-passhow-button::before {
+	position: absolute;
+	content: '';
+	left: 50%;
+	top: 50%;
+}
+
+.md .input-passhow-button::after {
+	font-size: calc(var(--f7-input-clear-button-size) / (24 / 20));
+	content: 'visibility';
+	line-height: 1.2;
+}

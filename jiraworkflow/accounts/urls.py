@@ -12,6 +12,10 @@ urlpatterns = [
     # path('social/', include('social_django.urls', namespace='social')),
     path('accounts/social/', include('allauth.urls')),
     path('accounts/login/out',views.loginout, name='loginout'),
+    path('accounts/setting', views.settings, name='setting'),
+    path('accounts/setting/repassword', views.repassword, name='repassword'),
+    path('accounts/setting/notification', views.notification, name='notification'),
+    path('accounts/remove', views.remove_current_user, name='remove_current_user'),
     # Профиль
     path('profile', views.profile, name='profile'),
     path('profile/custom/filter/enable', views.custom_filters_enable,  name='custom_filters_enable'),

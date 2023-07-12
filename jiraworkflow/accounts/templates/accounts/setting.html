@@ -1,0 +1,148 @@
+
+<!-- div class="toolbar tabbar toolbar-bottom">
+    <div class="toolbar-inner">
+    <a href="#tab-1" class="tab-link tab-link-active">Tab 1</a>
+    <a href="#tab-2" class="tab-link">Tab 2</a>
+    <a href="#tab-3" class="tab-link">Tab 3</a>
+    </div>
+</div -->
+<div class="row" style="height: inherit;">
+    <div class="col-30" style="margin: 0px;margin-bottom: 0px;">
+        <div class="list inset" style="margin: 0;">
+            <ul>
+              <li>
+                <a href="#tab-1" class="item-link item-content tab-link tab-link-active" style="padding-left: 0px;">
+                  <div class="item-media"><center style="margin: auto;"><i class="material-icons icon" style="text-align: center;">fingerprint</i></center></div>
+                  <div class="item-inner">
+                    <div class="item-title">Логин и Пароль</div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="#tab-2" class="item-link item-content tab-link" style="padding-left: 0px;">
+                  <div class="item-media"><center style="margin: auto;"><i class="material-icons icon" style="text-align: center;">campaign</i></center></div>
+                  <div class="item-inner">
+                    <div class="item-title">Оповещение</div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="#tab-3" class="item-link item-content tab-link" style="padding-left: 0px;">
+                  <div class="item-media"><center style="margin: auto;"><i class="material-icons icon" style="text-align: center;">block</i></center></div>
+                  <div class="item-inner">
+                    <div class="item-title">Удалить аккаунт</div>
+                  </div>
+                </a>
+              </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-70" style="height: 100%;overflow: auto;">
+        <div class="tabs" style="height: 100%;">
+            <div id="tab-1" class="page-content tab tab-active">
+                <div class="block" >
+                    <div class="block-title">Логин и Email</div>
+                    <form method="POST" enctype="multipart/form-data" class="list no-hairlines-md form-ajax-submit-onchange" action="./accounts/setting">
+                      {% csrf_token %}
+                      <ul style="padding-top: 10px;padding-bottom: 10px;">
+                        <li class="item-content item-input item-input-with-info">
+                          <div class="item-media">
+                            <i class="icon demo-list-icon"></i>
+                          </div>
+                          <div class="item-inner">
+                            <div class="item-input-wrap">
+                              <!-- input type="text" placeholder="Пользователя" required validate / -->
+                              {{loginForm.username}}
+                              <span class="input-clear-button"></span>
+                              <div class="item-input-info">Имя пользователя</div>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info">
+                          <div class="item-media">
+                            <i class="icon demo-list-icon"></i>
+                          </div>
+                          <div class="item-inner">
+                            <div class="item-input-wrap">
+                              <!-- input type="email" placeholder="E-mail" required validate / -->
+                              {{loginForm.email}}
+                              <span class="input-clear-button"></span>
+                              <div class="item-input-info">E-mail</div>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </form>
+                </div>
+                <div class="block" >
+                  <div class="block-title">Пароль</div>
+                  <form  class="list no-hairlines-md form-ajax-submit" method="POST" enctype="multipart/form-data" action="./accounts/setting/repassword">
+                    {% csrf_token %}
+                    <ul style="padding-bottom: 10px;margin-top: 10xp;">
+                      <li class="item-content item-input item-input-with-info" style="padding-bottom: 0px;">
+                        <div class="item-media">
+                          <i class="icon demo-list-icon"></i>
+                        </div>
+                        <div class="item-inner">
+                          <div class="item-input-wrap">
+                            <!-- input type="text" placeholder="Пороль" required validate /-->
+                            {{passForm.new_password1}}
+                            <span class="input-clear-button"></span>
+                            <span class="input-passhow-button"></span>
+                            <div class="item-input-info">Новый пароль</div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="item-content item-input item-input-with-info">
+                        <div class="item-media">
+                          <i class="icon demo-list-icon"></i>
+                        </div>
+                        <div class="item-inner">
+                          <div class="item-input-wrap">
+                            <!-- input type="text" placeholder="Пороль" required validate /-->
+                            {{passForm.new_password2}}
+                            <span class="input-clear-button"></span>
+                            <div class="item-input-info">Введи новый пароль еще раз</div>
+                          </div>
+                        </div>
+                      </li>
+                      <li style="padding: 20px;width: 200px;float: right;padding-top: 30px;padding-right: 0px;">
+                        <button class="button button-small button-outline" type="submit" style="width: auto;float: right;">Сменить пароль</button>
+                      <div style="height: 20px;"></div>
+                    </li>
+                    </ul>
+                  </form>
+              </div>
+            </div>
+            <div id="tab-2" class="page-content tab">
+                <form class="block form-ajax-submit-onchange" method="POST" enctype="multipart/form-data" action="./accounts/setting/notification">
+                  {% csrf_token %}
+                  <p>Оповещение о синхронизации</p>
+                  <p>Оповещение о выполнени синхронизации, успешной, а так же при сбоях или ошибках при выполнени синхронизации, на почтовый адрес указаный в профиле.</p>
+                  <div class="list inset">
+                    <ul>
+                      {% for radio in notificationForm.notification %}
+                      <li>
+                        <label class="item-radio item-radio-icon-start item-content">
+                          {{ radio.tag }}
+                          <!--input type="radio" name="demo-radio-start" value="all"-->
+                          <i class="icon icon-radio"></i>
+                          <div class="item-inner">
+                            <div class="item-title">{{ radio.choice_label }}</div>
+                          </div>
+                        </label>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </form>
+            </div>
+            <div id="tab-3" class="page-content tab">
+                <div class="block">
+                <p>Удаление аккаунта</p>
+                <p>Полное удаление аккаунта, жми кнопку "удалить аккаунт".</p>
+                <button class="button button-small button-outline color-red remove_current_user" type="submit" style="width: auto;margin: auto;top: 30px;">Удалить аккаунт</button>                </div>
+            </div>
+        </div>
+    </div>
+</div>

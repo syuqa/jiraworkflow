@@ -3,11 +3,31 @@ from .models import *
 from djangocodemirror.fields import CodeMirrorField
 from djangocodemirror.widgets import CodeMirrorWidget
 from Jira.models import JiraFilters, JiraExercise
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+from django.contrib.auth import update_session_auth_hash
+
+class SetPasswordForm(SetPasswordForm):
+    class Meta:
+        model = CustomUser
+        fields = ['new_password1', 'new_password2']
+        widgets = {
+            "new_password1": forms.PasswordInput(attrs={'placeholder': 'Введите новый пароль', 'required': '', 'validate':''}),
+            "new_password2": forms.PasswordInput(attrs={'placeholder': 'Введите новый пароль', 'required': '', 'validate':''})
+        }
 
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
 
+
+class AccountSettingLogin(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email')
+        widgets = {
+            'username': forms.TextInput(attrs={'placeholder': 'Логин', 'required': '', 'validate':''}),
+            'email': forms.TextInput(attrs={'placeholder': 'Email', 'required': '', 'validate': ''}),
+        }
 
 class UserAccountForm(forms.ModelForm):
     class Meta:

@@ -40,6 +40,8 @@ services:
       - REDIS_PASSWORD=eYVX7EwVmmxKPCDmw
       - CELERY_BROKER=redis://redis:6379/0
       - TZ=Europe/Moscow
+    env_file:
+      config/app/conf.py
     volumes:
       - .:/opt/services/app/src
       - static:/opt/services/app/static
@@ -93,6 +95,8 @@ services:
       - CELERY_BROKER=redis://redis:6379/0
       - SECRET_KEY=4d!2@*cmd5)xz$s#jt9xt8dcox2om!78a^=+wy!dyyf)9b!lkj
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    env_file:
+      config/app/conf.py
     networks:
       - radis_network
       - database1_network
@@ -110,6 +114,8 @@ services:
       - CELERY_BROKER=redis://redis:6379/0
       - SECRET_KEY=4d!2@*cmd5)xz$s#jt9xt8dcox2om!78a^=+wy!dyyf)9b!lkj
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    env_file:
+      config/app/conf.py
     networks:
       - radis_network
       - database1_network

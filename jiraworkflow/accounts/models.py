@@ -4,6 +4,11 @@ from multiselectfield import MultiSelectField
 
 
 class CustomUser(AbstractUser):
+   notification_choices = (
+      ('enable', 'Включена'),
+      ('only_error', 'Включена, только при ошибках'),
+      ('disable', 'Выключена')
+   )
    week_choices = (
             (1, 'Понедельник'),
             (2, 'Вторник'),
@@ -21,4 +26,5 @@ class CustomUser(AbstractUser):
    user_time = models.CharField('Время запуска', max_length=5, default='23:00')
    user_filter = models.ManyToManyField('Jira.jirafilters', null=True, blank=True, verbose_name='Фильтр')
    user_filter_custom = models.BooleanField(default=False)
+   notification = models.CharField('Уведомление', max_length=50, default='disable')
 

@@ -7,21 +7,35 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as _login
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth import update_session_auth_hash
+
 from django_celery_results.models import TaskResult
 
 # TaskResult
 from accounts.models import CustomUser
 from Jira.models import JiraExercise
-from Jira.forms import JiraExerciseForm
+from Jira.forms import JiraExerciseForm, NotificationForm
 from Jira.processor import JiraTasks
 from timetta.tasks import custom_sync as task_custom_sync
+from django.core.mail import send_mail
 from .forms import *
+from django.conf import settings
+
+# send_mail(subject="Tess", message="Hello", recipient_list=['k-5.45mm@yandex.ru'])
+# send_mail(subject="Tess", message="Hello", recipient_list=['k-5.45mm@yandex.ru'], from_email=settings.DEFAULT_FROM_EMAIL)
 
 logger = logging.getLogger(__name__)
 
 def index(request):
     return render(request, 'accounts/index.html')
 
+
+def remove_current_user(request):
+    try:
+        request.user.delete()
+        return HttpResponse(status=200)
+    except Exception as e:
+        return JsonResponse({"msg": str(e)}, status=500, content_type="application/json")
 
 def login(request):
     if request.method == 'POST':
@@ -41,10 +55,47 @@ def login(request):
         form = LoginForm()
     return render(request, 'accounts/login.html', {'form': form} )
 
+@login_required
 def loginout(request):
     logout(request)
     return redirect('login')
 
+@login_required
+def repassword(request):
+    if request.method == 'POST':
+        form = SetPasswordForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return HttpResponse(status=200)
+        else:
+            return JsonResponse({"msg": json.loads(form.errors.as_json())}, status=500, content_type="application/json")
+
+@login_required      
+def notification(request):
+    if request.method == 'POST':
+        form = NotificationForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return HttpResponse(status=200)
+        else:
+            return JsonResponse({"msg": json.loads(form.errors.as_json())}, status=500, content_type="application/json")
+
+@login_required
+def settings(request):
+    if request.method == 'POST':
+        form = AccountSettingLogin(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return HttpResponse(status=200)
+        else:
+            return JsonResponse({"msg": str(form.errors.as_json())}, status=500, content_type="application/json") 
+    context = {
+        "loginForm": AccountSettingLogin(instance=request.user),
+        "passForm": SetPasswordForm(request.user),
+        "notificationForm": NotificationForm(instance=request.user)
+    }
+    return render(request, 'accounts/setting.html', context)
 
 
 @login_required
@@ -174,7 +225,6 @@ def userform(request, id=0):
 def userdelete(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode())
-        logger.debug(users)
         if data.get('users'):
             for user in data.get('users'):
                 try:

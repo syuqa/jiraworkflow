@@ -79,16 +79,16 @@ class JiraTasks:
         else:
             return timeSpent
 
-    def get_worksheets(self, worklog, user):
+    def get_worksheets(self, worklog, user, sdate, edate):
         time_spents = {}
         for log in worklog:
             print('log:', log)
             #print('logAttr:', log.__dict__)
             print('autor:', log.author.name, ', user:', user.username)
-            created =  datetime.strptime(log.started, '%Y-%m-%dT%H:%M:%S.%f%z')
-            if log.author.name == user.username and datetime.now().year == created.year:
+            created =  datetime.strptime(log.started, '%Y-%m-%dT%H:%M:%S.%f%z').replace(tzinfo=None)
+            if log.author.name == user.username and created >= sdate and created <= edate:
                 date = created.strftime('%Y-%m-%d')
-                print('date:', date, 'timeSpent', log.timeSpent)
+                print('date:', date, 'timeSpent', log.timeSpent, log.created)
                 time_spents[date] = self.get_time_spent(time_spents, date, log.timeSpent)
         return time_spents
 
@@ -114,7 +114,9 @@ class JiraTasks:
                 logger.info({"JiraSunc": {"Tasks search worklog": {"user": user.username, 'issue_list': str(issues_list), }}})
                 for issue in issues_list:
                     # print('worklogs:', issue.fields.worklog.worklogs)
-                    worklog = self.get_worksheets(issue.fields.worklog.worklogs, user)
+                    _sdate = sdate if sdate else datetime.today() - timedelta(datetime.weekday(datetime.today()))
+                    _edate = edate if edate else datetime.today() + timedelta(6 - datetime.weekday(datetime.today()))
+                    worklog = self.get_worksheets(issue.fields.worklog.worklogs, user, _sdate, _edate)
                     project = issue.get_field('project').key
                     logger.info({"JiraSunc": {"Get worklog":{"user": user.username, "issue": str(issue), "worklog": str(worklog)}}})
                     if worklog:

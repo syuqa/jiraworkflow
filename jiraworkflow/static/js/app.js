@@ -66,7 +66,10 @@ function popup_info(el){
 // Профиль
 routes.push({
   path: '/profile/',
-  url: './profile'
+  url: './profile',
+  on: {
+    pageInit: function(event, page){}
+  }
 })
 
 // Разлогин
@@ -1054,7 +1057,73 @@ const buttons = {
     text: 'Профиль',
     cssClass: 'button button-raised button-fill button-round menu-button seagreen repassword',
     onClick: function(dialog, e){
-      navigate('/repassword/')
+      const settings = (content) => {
+        return app.dialog.create({
+        title: 'Настройки профиля',
+        content: content,
+        cssClass: 'dialog-profile',
+        on: {
+          opened: function (dialog) {
+            console.log('dialog')
+            let d = dialog.$el.find('.dialog-inner').append(
+              $$('<span style="position: absolute;right: 20px;top: 20px;opacity: 0.3;" class="material-icons icon hover-op link dialog-close">highlight_off</span>')
+            )
+            // 
+            console.log(d)
+            dialog.$el.on('click', '.dialog-close', function(){
+              app.dialog.close()
+            })
+            //
+            dialog.$el.on('click', '.remove_current_user', function(){
+              app.request.get('./accounts/remove', function(){
+                app.toast.create({
+                  icon: '<i class="material-icons">task_alt</i>',
+                  text: 'Аккаунт удален',
+                  position: 'center',
+                  closeTimeout: 3000,
+                }).open()
+                navigate('/loginout/')
+              })
+            })
+            //
+            $('.form-ajax-submit').on('formajax:error', function(request) {
+              console.log(JSON.parse(request.detail.xhr.response))
+              app.notification.create({
+                title: 'Изменение пароля',
+                titleRightText: 'ошибка',
+                subtitle: 'Исправте:',
+                closeTimeout: 5000,
+                closeButton: true,
+                on: {
+                  open: function(){
+                    let content = this.$el.find('.notification-content')
+                    let errors = $$('<div><ul style="font-size: 12px;"></ul></div>')
+                    console.log(request)
+                    for (msg of JSON.parse(request.detail.xhr.response).msg.new_password2){
+                      errors.find('ul').append(
+                        $$(`<li>${msg.message}</li>`)
+                        )
+                    }
+                    content.append(errors)
+                  }
+                }
+              }).open()
+            })
+            $('.form-ajax-submit').on('formajax:success', function(request) {
+              app.notification.create({
+                title: 'Изменение пароля',
+                titleRightText: '',
+                subtitle: 'Пароль изменен',
+                closeTimeout: 3000,
+              }).open()
+            })
+          }}
+        })
+      }
+      app.request.get('./accounts/setting', function(request){
+        let _dialog = settings(request)
+            _dialog.open()
+      })
     }
   },
   'jira': {

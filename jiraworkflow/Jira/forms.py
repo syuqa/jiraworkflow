@@ -3,6 +3,7 @@ from .models import *
 from django_celery_results.models import TaskResult
 from django_json_widget.widgets import JSONEditorWidget
 from djangocodemirror.fields import CodeMirrorField
+from accounts.models import CustomUser
 class JiraConnectForm(forms.ModelForm):
     class Meta:
         model = JitaConnect
@@ -11,6 +12,14 @@ class JiraConnectForm(forms.ModelForm):
             'url': forms.TextInput(attrs={'placeholder':'Адрес сервера'}),
             'username': forms.TextInput(attrs={'placeholder': 'Имя пользователя'}),
             'password': forms.PasswordInput(attrs={'placeholder': 'Пароль или токен'}),
+        }
+
+class NotificationForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ('notification', )
+        widgets = {
+            'notification': forms.RadioSelect(choices=CustomUser.notification_choices),
         }
 
 class JiraFiltersForm(forms.ModelForm):
